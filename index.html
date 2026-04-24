@@ -3,804 +3,1203 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ratio Check</title>
+  <title>LA ESQUINA ONLINE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0d0d0b;
-      --surface: #161614;
-      --border: rgba(255,255,255,0.08);
-      --text: #f0ede6;
-      --muted: #706e68;
-      --accent: #f0ede6;
-      --ratioed: #e8412c;
-      --safe: #2dbd6e;
-      --ratioed-bg: rgba(232,65,44,0.08);
-      --safe-bg: rgba(45,189,110,0.08);
+      --bg: #dbd4c7;
+      --paper: #ffffff;
+      --paper-strong: #ffffff;
+      --ink: #1e2329;
+      --muted: #5f666e;
+      --border: rgba(30, 35, 41, 0.18);
+      --red: #e34c43;
+      --amber: #b69757;
+      --green: #4c8f63;
+      --shadow: 0 18px 44px rgba(30, 35, 41, 0.1);
     }
 
-    html { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; }
+    html {
+      background: var(--bg);
+      scroll-behavior: smooth;
+    }
+
+    body,
+    button,
+    input {
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: var(--ink);
+    }
 
     body {
       min-height: 100vh;
+    }
+
+    .page-shell {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 1.25rem 2.5rem;
+    }
+
+    .site-header,
+    .site-footer {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      padding: 3rem 1.5rem 6rem;
-    }
-
-    /* ── Header ── */
-    header {
-      text-align: center;
-      margin-bottom: 3.5rem;
-    }
-    header h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(4rem, 14vw, 9rem);
-      letter-spacing: 0.04em;
-      line-height: 0.9;
-      color: var(--text);
-    }
-    header h1 span { color: var(--ratioed); }
-    header p {
-      font-size: 0.72rem;
-      color: var(--muted);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-top: 1rem;
-    }
-
-    /* ── Input ── */
-    .input-wrap {
-      width: 100%;
-      max-width: 600px;
-      margin-bottom: 2rem;
-    }
-    .input-row {
-      display: flex;
-      gap: 0;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      overflow: hidden;
-      transition: border-color 0.2s;
-    }
-    .input-row:focus-within { border-color: rgba(255,255,255,0.3); }
-    .input-row input {
-      flex: 1;
-      background: var(--surface);
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.82rem;
-      padding: 14px 16px;
-    }
-    .input-row input::placeholder { color: var(--muted); }
-    .input-row button {
-      background: var(--text);
-      color: var(--bg);
-      border: none;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem;
-      letter-spacing: 0.08em;
-      padding: 0 24px;
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-    .input-row button:hover { background: #ccc; }
-    .input-row button:disabled { background: #444; color: #888; cursor: not-allowed; }
-
-    .err-msg {
-      display: none;
-      margin-top: 10px;
-      font-size: 0.72rem;
-      color: var(--ratioed);
-      letter-spacing: 0.04em;
-    }
-
-    /* ── Result card ── */
-    #result {
-      display: none;
-      width: 100%;
-      max-width: 600px;
-      flex-direction: column;
+      justify-content: space-between;
       gap: 1.5rem;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid rgba(30, 35, 41, 0.12);
     }
 
-    /* Verdict banner */
-    .verdict {
-      border-radius: 4px;
-      padding: 1.5rem 2rem;
-      display: flex;
+    .site-footer {
+      margin-top: 4rem;
+      border-top: 1px solid rgba(30, 35, 41, 0.12);
+      border-bottom: none;
+    }
+
+    .brand {
+      display: inline-flex;
       align-items: center;
+      gap: 0.35rem;
+      color: var(--ink);
+      font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .brand-dot {
+      color: var(--red);
+    }
+
+    .footer-nav,
+    .footer-meta {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .footer-nav a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .footer-nav a:hover {
+      color: var(--ink);
+    }
+
+    .hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 4.5rem 0 0;
+      text-align: center;
+    }
+
+    .mono-kicker,
+    .section-title,
+    .meta-note,
+    .metric-label,
+    .axis-label,
+    .score-chip,
+    .footer-note {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .hero h1 {
+      margin-top: 0.9rem;
+      font-size: clamp(2.8rem, 6.5vw, 4.4rem);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+    }
+
+    .hero-copy {
+      max-width: 640px;
+      margin: 1rem auto 0;
+      font-size: clamp(1rem, 1.9vw, 1.15rem);
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .search-box {
+      margin-top: 2rem;
+      padding: 0;
+      border: 1px solid rgba(30, 35, 41, 0.22);
+      border-radius: 16px;
+      background: var(--paper-strong);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .search-box .field.has-addons {
+      margin-bottom: 0;
+    }
+
+    .search-box .control.is-expanded {
+      display: flex;
+    }
+
+    .input.ratio-input {
+      min-height: 64px;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+      padding-inline: 1.2rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.92rem;
+    }
+
+    .input.ratio-input:focus {
+      box-shadow: none;
+    }
+
+    .button.analyze-btn {
+      min-width: 160px;
+      min-height: 64px;
+      border: none;
+      border-radius: 0;
+      background: var(--ink);
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .button.analyze-btn:hover {
+      background: #111418;
+      color: #fff;
+    }
+
+    .button.analyze-btn[disabled] {
+      background: #8f949b;
+      color: #fff;
+    }
+
+    .error-text {
+      display: none;
+      margin-top: 0.75rem;
+      text-align: left;
+      color: var(--red);
+    }
+
+    .result-shell {
+      display: none;
+      max-width: 820px;
+      margin: 2.5rem auto 0;
+      animation: fade-up 0.35s ease;
+    }
+
+    .result-frame {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(30, 35, 41, 0.12);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 1rem;
+    }
+
+    .result-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.95rem;
+    }
+
+    .section-title {
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(30, 35, 41, 0.12);
+    }
+
+    .frame-kicker {
+      padding-top: 0.1rem;
+      text-align: center;
+    }
+
+    .tweet-card,
+    .analysis-card,
+    .metric-card,
+    .share-card,
+    .modal-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+    }
+
+    .tweet-card {
+      padding: 1rem 1.1rem 0.95rem;
+      border-radius: 18px;
+    }
+
+    .tweet-top {
+      display: flex;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 1rem;
-    }
-    .verdict.ratioed { background: var(--ratioed-bg); border: 1px solid rgba(232,65,44,0.3); }
-    .verdict.safe    { background: var(--safe-bg);    border: 1px solid rgba(45,189,110,0.3); }
-    .verdict-label {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 3.5rem;
-      line-height: 1;
-      letter-spacing: 0.06em;
-    }
-    .verdict.ratioed .verdict-label { color: var(--ratioed); }
-    .verdict.safe    .verdict-label { color: var(--safe); }
-    .verdict-desc {
-      font-size: 0.72rem;
-      color: var(--muted);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      line-height: 1.7;
-      text-align: right;
+      margin-bottom: 0.8rem;
     }
 
-    /* Tweet card */
-    .tweet-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1.5rem;
-    }
     .tweet-author {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 1rem;
+      gap: 0.9rem;
+      min-width: 0;
     }
+
     .tweet-avatar {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: #2a2a28;
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      background: #d7d1c8;
       overflow: hidden;
-      flex-shrink: 0;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.2rem;
+      font-weight: 700;
       color: var(--muted);
+      flex-shrink: 0;
     }
-    .tweet-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .tweet-author-name {
-      font-family: 'Instrument Serif', serif;
+
+    .tweet-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .tweet-meta {
+      min-width: 0;
+    }
+
+    .tweet-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-width: 0;
+    }
+
+    .tweet-name {
+      font-weight: 700;
       font-size: 1rem;
-      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .tweet-author-handle {
+
+    .tweet-badge {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      background: #1d9bf0;
+      color: #fff;
       font-size: 0.72rem;
-      color: var(--muted);
-      margin-top: 2px;
+      font-weight: 700;
+      line-height: 1;
+      flex-shrink: 0;
     }
+
+    .tweet-handle,
+    .tweet-date {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .tweet-mark {
+      font-size: 1.65rem;
+      line-height: 1;
+      color: var(--ink);
+      opacity: 0.9;
+      flex-shrink: 0;
+    }
+
     .tweet-text {
-      font-family: 'Instrument Serif', serif;
-      font-size: 1.1rem;
-      line-height: 1.65;
-      color: var(--text);
+      font-size: clamp(1.05rem, 1.9vw, 1.28rem);
+      line-height: 1.64;
       white-space: pre-wrap;
       word-break: break-word;
-      margin-bottom: 1rem;
+      margin-top: 0.9rem;
     }
-    .tweet-date {
-      font-size: 0.68rem;
+
+    .tweet-actions {
+      margin-top: 1rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid rgba(30, 35, 41, 0.12);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
       color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .tweet-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-width: 0;
+    }
+
+    .analysis-card {
+      padding: 1.15rem 1rem 0.9rem;
+      border-radius: 18px;
+      background: #f2f1eb;
+    }
+
+    .analysis-verdict {
+      text-align: center;
+      padding: 0.15rem 0 0.9rem;
+    }
+
+    .sentiment-panel {
+      padding: 0.15rem 0 0.1rem;
+    }
+
+    .axis-wrap {
+      position: relative;
+      padding-top: 0.2rem;
+    }
+
+    .axis-track {
+      position: relative;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--red) 0%, #e6a26f 24%, #ddd2bc 50%, #c9d5c3 76%, var(--green) 100%);
+    }
+
+    .axis-marker {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      background: var(--amber);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 10px 22px rgba(30, 35, 41, 0.18);
+      transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s ease;
+    }
+
+    .axis-labels {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      margin-top: 0.6rem;
+    }
+
+    .axis-labels .axis-label:nth-child(2) {
+      justify-self: center;
+      color: var(--ink);
+      font-weight: 400;
+    }
+
+    .axis-labels .axis-label:last-child {
+      justify-self: end;
+    }
+
+    .axis-labels .axis-label:first-child,
+    .axis-labels .axis-label:last-child {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .metrics-strip {
+      margin-top: 0.8rem;
+      padding: 0.55rem 0.65rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(30, 35, 41, 0.06);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      padding-top: 0;
+    }
+
+    .metric-card {
+      padding: 0.3rem 0.25rem;
+      border-radius: 0;
+      text-align: center;
+      background: transparent;
+      border: none;
+      border-right: 1px solid rgba(30, 35, 41, 0.08);
+      box-shadow: none;
+    }
+
+    .metric-card:last-child {
+      border-right: none;
+    }
+
+    .metric-label {
+      font-size: 0.56rem;
+      letter-spacing: 0.1em;
+      line-height: 1.1;
+      font-weight: 500;
+    }
+
+    .metric-value {
+      margin-top: 0.18rem;
+      font-size: clamp(0.95rem, 1.5vw, 1.12rem);
+      font-weight: 500;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .metric-card.is-bad {
+      background: rgba(239, 83, 80, 0.04);
+    }
+
+    .metric-card.is-bad .metric-value {
+      color: var(--red);
+    }
+
+    .metric-card.is-good {
+      background: rgba(90, 156, 111, 0.04);
+    }
+
+    .metric-card.is-good .metric-value {
+      color: var(--green);
+    }
+
+    .analysis-card.is-ratioed {
+      background: rgba(239, 83, 80, 0.08);
+    }
+
+    .analysis-card.is-safe {
+      background: rgba(90, 156, 111, 0.08);
+    }
+
+    .analysis-card.is-neutral {
+      background: rgba(200, 165, 106, 0.08);
+    }
+
+    .analysis-card.is-ratioed .verdict-title {
+      color: var(--red);
+    }
+
+    .analysis-card.is-safe .verdict-title {
+      color: var(--green);
+    }
+
+    .analysis-card.is-neutral .verdict-title {
+      color: var(--ink);
+    }
+
+    .verdict-title {
+      margin-top: 0.35rem;
+      font-size: clamp(2.8rem, 6.4vw, 4.8rem);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+      text-transform: uppercase;
+    }
+
+    .share-card {
+      margin-top: 0;
+      padding-top: 0.85rem;
+      border: none;
+      border-top: 1px solid rgba(30, 35, 41, 0.12);
+      background: transparent;
+      border-radius: 0;
+    }
+
+    .share-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 0;
+    }
+
+    .share-actions .button {
+      min-height: 48px;
+      border-radius: 12px;
+      border: 1px solid rgba(30, 35, 41, 0.14);
+      background: rgba(255, 255, 255, 0.66);
+      color: var(--ink);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.76rem;
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
-    /* Metrics */
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+    .share-actions .button:hover {
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
     }
-    .metric {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 14px;
-    }
-    .metric-icon { font-size: 14px; margin-bottom: 6px; display: block; }
-    .metric-val {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.8rem;
-      letter-spacing: 0.04em;
-      color: var(--text);
-      line-height: 1;
-    }
-    .metric-lbl {
-      font-size: 0.62rem;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-    .metric.highlight-bad  { border-color: rgba(232,65,44,0.4); }
-    .metric.highlight-bad .metric-val { color: var(--ratioed); }
-    .metric.highlight-good { border-color: rgba(45,189,110,0.4); }
-    .metric.highlight-good .metric-val { color: var(--safe); }
 
-    /* Ratio score bar */
-    .ratio-bar-wrap { }
-    .ratio-bar-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.68rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .ratio-bar-track {
-      height: 6px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 3px;
+    .modal-card {
+      width: min(640px, calc(100vw - 2rem));
+      border-radius: 16px;
       overflow: hidden;
-      position: relative;
-    }
-    .ratio-bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
     }
 
-    /* Actions */
-    .actions {
-      display: flex;
-      gap: 10px;
+    .modal-card-head,
+    .modal-card-foot {
+      background: var(--paper);
+      border-color: rgba(30, 35, 41, 0.12);
     }
-    .btn {
-      flex: 1;
-      padding: 13px;
-      border-radius: 4px;
-      font-family: 'Bebas Neue', sans-serif;
+
+    .modal-card-title {
       font-size: 1rem;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      transition: all 0.15s;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
     }
-    .btn-primary {
-      background: var(--text);
-      color: var(--bg);
-      border-color: var(--text);
-    }
-    .btn-primary:hover { background: #ccc; border-color: #ccc; }
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.05); }
 
-    /* footer */
-    footer {
-      margin-top: auto;
-      padding-top: 4rem;
-      font-size: 0.65rem;
+    .modal-card-body {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .modal-card-body p {
       color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      text-align: center;
+      line-height: 1.75;
     }
-    footer a { color: var(--muted); text-decoration: none; }
-    footer a:hover { color: var(--text); }
 
-    /* ── Canvas for export (hidden) ── */
-    #export-canvas { display: none; }
+    .footer-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
 
-    /* loading spinner */
+    .footer-link-button {
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      cursor: pointer;
+    }
+
+    .footer-link-button:hover {
+      color: var(--ink);
+    }
+
     .spinner {
       display: none;
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.2);
-      border-top-color: var(--bg);
+      width: 16px;
+      height: 16px;
+      margin-right: 0.55rem;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 840px) {
+      .site-header,
+      .site-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .metrics-grid,
+      .share-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        padding-inline: 0.95rem;
+      }
+
+      .hero {
+        padding-top: 3rem;
+      }
+
+      .search-box .field.has-addons {
+        flex-direction: column;
+      }
+
+      .search-box .control {
+        width: 100%;
+      }
+
+      .button.analyze-btn {
+        width: 100%;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .tweet-actions,
+      .metrics-grid,
+      .share-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-card {
+        border-right: none;
+        border-bottom: 1px solid rgba(30, 35, 41, 0.08);
+      }
+
+      .metric-card:last-child {
+        border-bottom: none;
+      }
+    }
   </style>
 </head>
 <body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="LA ESQUINA ONLINE">
+        <span>La</span><span>Esquina</span><span class="brand-dot">Online</span>
+      </a>
+    </header>
 
-  <header>
-    <h1>RATIO<span>.</span>CHECK</h1>
-    <p>¿Lo ratiaron?&nbsp;&nbsp;Averigualo en segundos</p>
-  </header>
+    <main id="top">
+      <section class="hero">
+        <p class="mono-kicker">LA ESQUINA ONLINE</p>
+        <h1>¿Lo bancan o no?</h1>
+        <p class="hero-copy">Pegá un link de X o Twitter y te devolvemos una lectura clara: si al tuit lo putean, si lo bancan o si quedó en una zona moderada.</p>
 
-  <div class="input-wrap">
-    <div class="input-row">
-      <input type="text" id="tweet-url" placeholder="https://x.com/usuario/status/…" autocomplete="off" />
-      <button id="analyze-btn" onclick="analyze()">
-        <span class="spinner" id="spinner"></span>
-        Analizar
-      </button>
-    </div>
-    <p class="err-msg" id="err-msg"></p>
+        <div class="search-box">
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input class="input ratio-input" type="text" id="tweet-url" placeholder="https://x.com/usuario/status/…" autocomplete="off" />
+            </div>
+            <div class="control">
+              <button class="button analyze-btn" id="analyze-btn" onclick="analyze()">
+                <span class="spinner" id="spinner"></span>
+                Analizar
+              </button>
+            </div>
+          </div>
+        </div>
+        <p class="error-text meta-note" id="err-msg"></p>
+      </section>
+
+      <section class="result-shell" id="result">
+        <div class="result-frame">
+          <div class="result-stack">
+            <p class="frame-kicker mono-kicker">Tweet original:</p>
+
+            <article class="tweet-card">
+              <div class="tweet-top">
+                <div class="tweet-author">
+                  <div class="tweet-avatar" id="avatar-wrap">
+                    <img id="avatar-img" src="" alt="" style="display:none;" />
+                    <span id="avatar-initials"></span>
+                  </div>
+                  <div class="tweet-meta">
+                    <div class="tweet-name-row">
+                      <div class="tweet-name" id="author-name"></div>
+                      <span class="tweet-badge" id="author-badge">✓</span>
+                    </div>
+                    <div class="tweet-handle" id="author-handle"></div>
+                  </div>
+                </div>
+                <div class="tweet-mark">𝕏</div>
+              </div>
+              <div class="tweet-text" id="tweet-text"></div>
+              <div class="tweet-date" id="tweet-date"></div>
+
+              <div class="tweet-actions">
+                <div class="tweet-action"><span>◌</span><span id="tweet-replies-inline">0</span></div>
+                <div class="tweet-action"><span>↻</span><span id="tweet-retweets-inline">0</span></div>
+                <div class="tweet-action"><span>〃</span><span id="tweet-quotes-inline">0</span></div>
+                <div class="tweet-action"><span>♡</span><span id="tweet-likes-inline">0</span></div>
+              </div>
+            </article>
+
+            <section class="analysis-card" id="verdict">
+              <div class="analysis-verdict">
+                <h2 class="verdict-title" id="verdict-label"></h2>
+              </div>
+
+              <div class="sentiment-panel">
+                <div class="axis-wrap">
+                  <div class="axis-track"></div>
+                  <div class="axis-marker" id="axis-marker"></div>
+                </div>
+                <div class="axis-labels">
+                  <span class="axis-label">Lo putean</span>
+                  <span class="axis-label">0</span>
+                  <span class="axis-label">Lo bancan</span>
+                </div>
+              </div>
+
+              <section class="metrics-strip">
+                <div class="metrics-grid">
+                  <article class="metric-card" id="m-rep">
+                    <div class="metric-label">Comments</div>
+                    <div class="metric-value" id="v-rep">0</div>
+                  </article>
+                  <article class="metric-card" id="m-qt">
+                    <div class="metric-label">Quote tweets</div>
+                    <div class="metric-value" id="v-qt">0</div>
+                  </article>
+                  <article class="metric-card" id="m-lk">
+                    <div class="metric-label">Favs</div>
+                    <div class="metric-value" id="v-lk">0</div>
+                  </article>
+                  <article class="metric-card" id="m-rt">
+                    <div class="metric-label">Retuits</div>
+                    <div class="metric-value" id="v-rt">0</div>
+                  </article>
+                </div>
+              </section>
+            </section>
+
+            <section class="share-card">
+              <p class="frame-kicker mono-kicker" style="margin-bottom:0.75rem;">Compartí el resultado</p>
+              <div class="share-actions">
+                <button class="button" id="share-x-btn" onclick="shareOnX()">X (Twitter)</button>
+                <button class="button" onclick="shareOnWhatsApp()">WhatsApp</button>
+                <button class="button" id="copy-link-btn" onclick="copyLink()">Copy link</button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <a class="brand" href="#top" aria-label="LA ESQUINA ONLINE">
+          <span>La</span><span>Esquina</span><span class="brand-dot">Online</span>
+        </a>
+        <p class="footer-note">Hecho con datos públicos.</p>
+      </div>
+      <nav class="footer-nav footer-links">
+        <button class="footer-link-button" type="button" data-modal-target="modal-como-funciona">Cómo funciona</button>
+        <button class="footer-link-button" type="button" data-modal-target="modal-sobre-proyecto">Sobre el proyecto</button>
+      </nav>
+      <div class="footer-meta">
+        <span>datos vía fxtwitter</span>
+        <span>© 2026 LA ESQUINA ONLINE</span>
+      </div>
+    </footer>
   </div>
 
-  <div id="result">
-    <div class="verdict" id="verdict">
-      <div class="verdict-label" id="verdict-label"></div>
-      <div class="verdict-desc" id="verdict-desc"></div>
-    </div>
-
-    <div class="tweet-card">
-      <div class="tweet-author">
-        <div class="tweet-avatar" id="avatar-wrap">
-          <img id="avatar-img" src="" alt="" style="display:none;" />
-          <span id="avatar-initials"></span>
-        </div>
-        <div>
-          <div class="tweet-author-name" id="author-name"></div>
-          <div class="tweet-author-handle" id="author-handle"></div>
-        </div>
-      </div>
-      <div class="tweet-text" id="tweet-text"></div>
-      <div class="tweet-date" id="tweet-date"></div>
-    </div>
-
-    <div class="metrics">
-      <div class="metric" id="m-rt">
-        <span class="metric-icon">🔁</span>
-        <div class="metric-val" id="v-rt">0</div>
-        <div class="metric-lbl">Retuits</div>
-      </div>
-      <div class="metric" id="m-rep">
-        <span class="metric-icon">💬</span>
-        <div class="metric-val" id="v-rep">0</div>
-        <div class="metric-lbl">Replies</div>
-      </div>
-      <div class="metric" id="m-qt">
-        <span class="metric-icon">🗨️</span>
-        <div class="metric-val" id="v-qt">0</div>
-        <div class="metric-lbl">Quotes</div>
-      </div>
-      <div class="metric" id="m-lk">
-        <span class="metric-icon">❤️</span>
-        <div class="metric-val" id="v-lk">0</div>
-        <div class="metric-lbl">Likes</div>
-      </div>
-    </div>
-
-    <div class="ratio-bar-wrap">
-      <div class="ratio-bar-label">
-        <span>RTs&nbsp;vs&nbsp;Replies+Quotes</span>
-        <span id="ratio-score-lbl"></span>
-      </div>
-      <div class="ratio-bar-track">
-        <div class="ratio-bar-fill" id="ratio-bar-fill"></div>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="btn btn-primary" onclick="downloadImg()">Descargar imagen</button>
-      <button class="btn btn-secondary" onclick="shareImg()">Copiar al portapapeles</button>
+  <div class="modal" id="modal-como-funciona">
+    <div class="modal-background" data-close-modal></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Cómo funciona</p>
+        <button class="delete" aria-label="cerrar" data-close-modal></button>
+      </header>
+      <section class="modal-card-body">
+        <p>Tomamos replies y quote tweets como señal de fricción, y retuits como señal de circulación o apoyo. Con eso armamos un índice social que ubica el tuit sobre un eje entre crítica y banca.</p>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button" data-close-modal>Cerrar</button>
+      </footer>
     </div>
   </div>
 
-  <canvas id="export-canvas"></canvas>
+  <div class="modal" id="modal-sobre-proyecto">
+    <div class="modal-background" data-close-modal></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Sobre el proyecto</p>
+        <button class="delete" aria-label="cerrar" data-close-modal></button>
+      </header>
+      <section class="modal-card-body">
+        <p>LA ESQUINA ONLINE usa datos públicos de fxtwitter y muestra una lectura rápida del clima alrededor de un tuit. No interpreta ironía ni sarcasmo: ordena el balance entre respuesta y difusión.</p>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button" data-close-modal>Cerrar</button>
+      </footer>
+    </div>
+  </div>
 
-  <footer>
-    ratio.check &nbsp;·&nbsp; datos vía <a href="https://fxtwitter.com" target="_blank">fxtwitter</a>
-  </footer>
+  <script>
+    const fmt = n => (n || 0).toLocaleString('es-AR');
+    const MIN_RATIO_SAMPLE = 10;
+    let currentData = null;
+    let currentMetrics = null;
+    let currentTweetUrl = '';
+    let isLoading = false;
 
-<script>
-const fmt = n => (n || 0).toLocaleString('es-AR');
+    function parseTweetUrl(url) {
+      try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.replace(/^www\./, '').replace(/^mobile\./, '');
+        if (host !== 'twitter.com' && host !== 'x.com') return null;
 
-function parseTweetUrl(url) {
-  const m = url.match(/(?:twitter\.com|x\.com)\/([^/?#]+)\/status\/(\d+)/);
-  return m ? { username: m[1], id: m[2] } : null;
-}
+        const parts = parsed.pathname.split('/').filter(Boolean);
+        const statusIndex = parts.indexOf('status');
+        if (statusIndex < 1) return null;
 
-function setError(msg) {
-  const el = document.getElementById('err-msg');
-  el.textContent = msg;
-  el.style.display = msg ? 'block' : 'none';
-}
+        const username = parts[statusIndex - 1];
+        const id = parts[statusIndex + 1];
+        if (!/^[A-Za-z0-9_]{1,15}$/.test(username) || !/^\d+$/.test(id || '')) return null;
 
-function setLoading(on) {
-  const btn = document.getElementById('analyze-btn');
-  const sp  = document.getElementById('spinner');
-  btn.disabled = on;
-  sp.style.display = on ? 'inline-block' : 'none';
-  btn.textContent = on ? '' : 'Analizar';
-  if (on) btn.prepend(sp);
-}
-
-let currentData = null;
-
-async function analyze() {
-  const url = document.getElementById('tweet-url').value.trim();
-  setError('');
-  document.getElementById('result').style.display = 'none';
-
-  const parsed = parseTweetUrl(url);
-  if (!parsed) {
-    setError('URL no reconocida. Formato esperado: x.com/usuario/status/12345…');
-    return;
-  }
-
-  setLoading(true);
-  try {
-    const res = await fetch(`https://api.fxtwitter.com/${parsed.username}/status/${parsed.id}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (!data.tweet) throw new Error('No se encontró el tuit');
-    currentData = data.tweet;
-    renderResult(data.tweet);
-  } catch (e) {
-    setError('No se pudo obtener el tuit. Verificá que sea público. (' + e.message + ')');
-  } finally {
-    setLoading(false);
-  }
-}
-
-function renderResult(t) {
-  const rt      = t.retweets || 0;
-  const replies = t.replies  || 0;
-  const quotes  = t.quotes   || 0;
-  const likes   = t.likes    || 0;
-  const ratioed = (replies + quotes) > rt;
-  const total   = rt + replies + quotes + likes;
-  const score   = rt > 0 ? ((replies + quotes) / rt).toFixed(2) : '∞';
-
-  // Verdict
-  const vbox = document.getElementById('verdict');
-  vbox.className = 'verdict ' + (ratioed ? 'ratioed' : 'safe');
-  document.getElementById('verdict-label').textContent = ratioed ? '🔥 RATIADO' : '✅ SAFE';
-  document.getElementById('verdict-desc').innerHTML = ratioed
-    ? `Replies + quotes<br><strong>${fmt(replies + quotes)}</strong> > RTs <strong>${fmt(rt)}</strong>`
-    : `RTs <strong>${fmt(rt)}</strong><br>> Replies + quotes <strong>${fmt(replies + quotes)}</strong>`;
-
-  // Tweet card
-  if (t.author) {
-    document.getElementById('author-name').textContent   = t.author.name || '';
-    document.getElementById('author-handle').textContent = '@' + (t.author.screen_name || '');
-    document.getElementById('avatar-initials').textContent = (t.author.name || '?').charAt(0).toUpperCase();
-    const img = document.getElementById('avatar-img');
-    if (t.author.avatar_url) {
-      img.src = t.author.avatar_url;
-      img.style.display = 'block';
-      document.getElementById('avatar-initials').style.display = 'none';
+        return { username, id };
+      } catch {
+        return null;
+      }
     }
-  }
-  document.getElementById('tweet-text').textContent = t.text || '';
-  if (t.created_at) {
-    const d = new Date(t.created_at);
-    document.getElementById('tweet-date').textContent =
-      d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' }) + ' · ' +
-      d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-  }
 
-  // Metrics
-  document.getElementById('v-rt').textContent  = fmt(rt);
-  document.getElementById('v-rep').textContent = fmt(replies);
-  document.getElementById('v-qt').textContent  = fmt(quotes);
-  document.getElementById('v-lk').textContent  = fmt(likes);
+    function normalizeCount(value) {
+      const count = Number(value);
+      return Number.isFinite(count) && count > 0 ? Math.trunc(count) : 0;
+    }
 
-  ['m-rt','m-rep','m-qt','m-lk'].forEach(id => {
-    document.getElementById(id).className = 'metric';
-  });
-  if (ratioed) {
-    document.getElementById('m-rep').classList.add('highlight-bad');
-    document.getElementById('m-qt').classList.add('highlight-bad');
-    document.getElementById('m-rt').classList.add('highlight-good');
-  } else {
-    document.getElementById('m-rt').classList.add('highlight-good');
-  }
+    function computeRatioMetrics(tweet) {
+      const rt = normalizeCount(tweet?.retweets);
+      const replies = normalizeCount(tweet?.replies);
+      const quotes = normalizeCount(tweet?.quotes);
+      const likes = normalizeCount(tweet?.likes);
+      const opposition = replies + quotes;
+      const sample = rt + opposition;
+      const ratioScore = rt > 0 ? opposition / rt : (opposition > 0 ? Number.POSITIVE_INFINITY : null);
+      const sentimentScore = sample > 0 ? Math.round(((rt - opposition) / sample) * 100) : 0;
+      const markerPct = sample > 0 ? ((sentimentScore + 100) / 2) : 50;
 
-  // Bar
-  const opposition = rt + (replies + quotes);
-  const rtPct = opposition > 0 ? (rt / opposition) * 100 : 50;
-  const fill  = document.getElementById('ratio-bar-fill');
-  fill.style.width      = rtPct.toFixed(1) + '%';
-  fill.style.background = ratioed ? '#e8412c' : '#2dbd6e';
-  document.getElementById('ratio-score-lbl').textContent = `Score: ${score}`;
+      if (sample === 0) {
+        return {
+          rt,
+          replies,
+          quotes,
+          likes,
+          opposition,
+          sample,
+          verdict: 'neutral',
+          verdictLabel: 'Sin muestra',
+          verdictDesc: 'Todavía no hay suficiente movimiento para leer el clima del tuit.',
+          verdictNote: 'Hacen falta replies, quote tweets o retuits para ubicarlo en el eje.',
+          scoreLabel: 'Indice social n/d',
+          sentimentScore,
+          markerPct,
+          verified: false,
+        };
+      }
 
-  document.getElementById('result').style.display = 'flex';
-}
+      if (sample < MIN_RATIO_SAMPLE) {
+        return {
+          rt,
+          replies,
+          quotes,
+          likes,
+          opposition,
+          sample,
+          verdict: 'neutral',
+          verdictLabel: 'Zona gris',
+          verdictDesc: 'Todavía hay poco volumen para sacar una conclusión firme.',
+          verdictNote: `Solo aparecen ${fmt(sample)} interacciones útiles entre replies, quotes y retuits.`,
+          scoreLabel: `Indice social ${sentimentScore > 0 ? '+' : ''}${sentimentScore}`,
+          sentimentScore,
+          markerPct,
+          verified: false,
+        };
+      }
 
-/* ── Canvas export ── */
+      let verdict = 'neutral';
+      let verdictLabel = 'Quedó dividido';
+      let verdictDesc = 'El tuit quedó bastante parejo entre apoyo y crítica.';
 
-async function loadImageAsBase64(url) {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(blob);
-    });
-  } catch { return null; }
-}
+      if (sentimentScore <= -35) {
+        verdict = 'ratioed';
+        verdictLabel = 'Lo re bardean';
+        verdictDesc = 'Las respuestas críticas pesan mucho más que el apoyo y empujan el tuit hacia el extremo rojo.';
+      } else if (sentimentScore < -10) {
+        verdict = 'ratioed';
+        verdictLabel = 'Lo bardean';
+        verdictDesc = 'Hay más crítica que banca, aunque sin llegar a una paliza total.';
+      } else if (sentimentScore >= 35) {
+        verdict = 'safe';
+        verdictLabel = 'Lo re bancan';
+        verdictDesc = 'El apoyo domina con claridad y el tuit se acomoda del lado verde.';
+      } else if (sentimentScore > 10) {
+        verdict = 'safe';
+        verdictLabel = 'La gente banca';
+        verdictDesc = 'El apoyo gana por un margen claro, aunque no absoluto.';
+      }
 
-async function buildCanvas() {
-  const t = currentData;
-  if (!t) return null;
+      return {
+        rt,
+        replies,
+        quotes,
+        likes,
+        opposition,
+        sample,
+        verdict,
+        verdictLabel,
+        verdictDesc,
+        verdictNote: `Replies + quote tweets: ${fmt(opposition)} · Retuits: ${fmt(rt)} · Ratio replies/RT: ${ratioScore === Number.POSITIVE_INFINITY ? '∞' : ratioScore.toFixed(2)}`,
+        scoreLabel: `Indice social ${sentimentScore > 0 ? '+' : ''}${sentimentScore}`,
+        sentimentScore,
+        markerPct,
+        verified: Boolean(tweet?.author?.verified || tweet?.author?.blue_verified || tweet?.author?.is_blue_verified),
+      };
+    }
 
-  const rt      = t.retweets || 0;
-  const replies = t.replies  || 0;
-  const quotes  = t.quotes   || 0;
-  const likes   = t.likes    || 0;
-  const ratioed = (replies + quotes) > rt;
-  const score   = rt > 0 ? ((replies + quotes) / rt).toFixed(2) : '∞';
+    function setError(message) {
+      const el = document.getElementById('err-msg');
+      el.textContent = message;
+      el.style.display = message ? 'block' : 'none';
+    }
 
-  const W = 700, MARGIN = 36;
-  const canvas = document.getElementById('export-canvas');
+    function setLoading(on) {
+      const btn = document.getElementById('analyze-btn');
+      const spinner = document.getElementById('spinner');
+      isLoading = on;
+      btn.disabled = on;
+      spinner.style.display = on ? 'inline-block' : 'none';
+      btn.lastChild.textContent = on ? 'Analizando' : 'Analizar';
+    }
 
-  // Fonts via canvas (Bebas Neue loaded via Google Fonts)
-  await document.fonts.ready;
+    function resetResultState() {
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('verdict').className = 'analysis-card';
+      document.getElementById('verdict-label').textContent = '';
+      document.getElementById('author-name').textContent = '';
+      document.getElementById('author-handle').textContent = '';
+      document.getElementById('author-badge').style.display = 'none';
+      document.getElementById('tweet-text').textContent = '';
+      document.getElementById('tweet-date').textContent = '';
+      document.getElementById('avatar-initials').textContent = '';
+      document.getElementById('avatar-initials').style.display = 'inline';
+      document.getElementById('tweet-replies-inline').textContent = '0';
+      document.getElementById('tweet-retweets-inline').textContent = '0';
+      document.getElementById('tweet-quotes-inline').textContent = '0';
+      document.getElementById('tweet-likes-inline').textContent = '0';
 
-  const TEXT_COLOR   = '#f0ede6';
-  const MUTED        = '#706e68';
-  const SURFACE      = '#161614';
-  const BORDER       = 'rgba(255,255,255,0.08)';
-  const RATIOED_CLR  = '#e8412c';
-  const SAFE_CLR     = '#2dbd6e';
-  const verdict_clr  = ratioed ? RATIOED_CLR : SAFE_CLR;
+      const avatarImg = document.getElementById('avatar-img');
+      avatarImg.removeAttribute('src');
+      avatarImg.alt = '';
+      avatarImg.style.display = 'none';
+      avatarImg.onerror = null;
 
-  // Load avatar
-  let avatarImg = null;
-  if (t.author?.avatar_url) {
-    const b64 = await loadImageAsBase64(t.author.avatar_url);
-    if (b64) {
-      avatarImg = await new Promise(resolve => {
-        const img = new Image();
-        img.onload  = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = b64;
+      document.getElementById('v-rep').textContent = '0';
+      document.getElementById('v-qt').textContent = '0';
+      document.getElementById('v-lk').textContent = '0';
+      document.getElementById('v-rt').textContent = '0';
+
+      ['m-rep', 'm-qt', 'm-lk', 'm-rt'].forEach(id => {
+        document.getElementById(id).className = 'metric-card';
       });
+      const marker = document.getElementById('axis-marker');
+      marker.style.left = '50%';
+      marker.style.background = 'var(--amber)';
     }
-  }
 
-  // Measure text to get height
-  const textLines = wrapText(t.text || '', W - MARGIN * 2 - 32, '18px "Instrument Serif"');
-  const H = 36 + 80 + 24 + 20 + 16 + textLines.length * 26 + 16 + 20 + 36 + 16 + 96 + 16 + 40 + 36 + 60;
+    async function fetchTweet(username, id) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-  canvas.width  = W * 2;
-  canvas.height = H * 2;
-  canvas.style.width  = W + 'px';
-  canvas.style.height = H + 'px';
+      try {
+        const res = await fetch(`https://api.fxtwitter.com/${encodeURIComponent(username)}/status/${id}`, {
+          signal: controller.signal,
+          headers: { Accept: 'application/json' },
+        });
 
-  const ctx = canvas.getContext('2d');
-  ctx.scale(2, 2);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-  // BG
-  ctx.fillStyle = '#0d0d0b';
-  ctx.fillRect(0, 0, W, H);
+        const data = await res.json();
+        if (!data || typeof data !== 'object' || !data.tweet) {
+          throw new Error('No se encontró el tuit');
+        }
 
-  let y = MARGIN;
-
-  // ── Verdict box ──
-  const vboxH = 80;
-  ctx.fillStyle = ratioed ? 'rgba(232,65,44,0.08)' : 'rgba(45,189,110,0.08)';
-  roundRect(ctx, MARGIN, y, W - MARGIN * 2, vboxH, 4);
-  ctx.fill();
-  ctx.strokeStyle = ratioed ? 'rgba(232,65,44,0.35)' : 'rgba(45,189,110,0.35)';
-  ctx.lineWidth = 1;
-  roundRect(ctx, MARGIN, y, W - MARGIN * 2, vboxH, 4);
-  ctx.stroke();
-
-  ctx.font = '500 52px "Bebas Neue"';
-  ctx.fillStyle = verdict_clr;
-  ctx.textAlign = 'left';
-  ctx.fillText(ratioed ? '🔥  RATIADO' : '✅  SAFE', MARGIN + 20, y + 50);
-
-  // ratio score top-right
-  ctx.font = '400 11px "DM Mono"';
-  ctx.fillStyle = ratioed ? 'rgba(232,65,44,0.7)' : 'rgba(45,189,110,0.7)';
-  ctx.textAlign = 'right';
-  const desc = ratioed
-    ? `replies+quotes (${fmt(replies + quotes)}) > RTs (${fmt(rt)})`
-    : `RTs (${fmt(rt)}) > replies+quotes (${fmt(replies + quotes)})`;
-  ctx.fillText(desc.toUpperCase(), W - MARGIN - 20, y + 36);
-  ctx.fillText(`SCORE: ${score}`, W - MARGIN - 20, y + 54);
-  ctx.textAlign = 'left';
-
-  y += vboxH + 16;
-
-  // ── Tweet card ──
-  const tweetCardH = 24 + textLines.length * 26 + 16 + 20 + 36 + 16;
-  ctx.fillStyle = SURFACE;
-  roundRect(ctx, MARGIN, y, W - MARGIN * 2, 20 + 44 + 16 + tweetCardH, 4);
-  ctx.fill();
-  ctx.strokeStyle = BORDER;
-  ctx.lineWidth = 1;
-  roundRect(ctx, MARGIN, y, W - MARGIN * 2, 20 + 44 + 16 + tweetCardH, 4);
-  ctx.stroke();
-
-  const tx = MARGIN + 20;
-  y += 20;
-
-  // Avatar
-  const avatarR = 22;
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(tx + avatarR, y + avatarR, avatarR, 0, Math.PI * 2);
-  ctx.clip();
-  if (avatarImg) {
-    ctx.drawImage(avatarImg, tx, y, avatarR * 2, avatarR * 2);
-  } else {
-    ctx.fillStyle = '#2a2a28';
-    ctx.fillRect(tx, y, avatarR * 2, avatarR * 2);
-    ctx.font = '500 18px "Bebas Neue"';
-    ctx.fillStyle = MUTED;
-    ctx.textAlign = 'center';
-    ctx.fillText((t.author?.name || '?').charAt(0).toUpperCase(), tx + avatarR, y + avatarR + 7);
-    ctx.textAlign = 'left';
-  }
-  ctx.restore();
-
-  // Author
-  const ax = tx + avatarR * 2 + 12;
-  ctx.font = '400 15px "Instrument Serif"';
-  ctx.fillStyle = TEXT_COLOR;
-  ctx.fillText(t.author?.name || '', ax, y + 17);
-  ctx.font = '400 11px "DM Mono"';
-  ctx.fillStyle = MUTED;
-  ctx.fillText('@' + (t.author?.screen_name || ''), ax, y + 34);
-
-  y += 44 + 16;
-
-  // Tweet text
-  ctx.font = '400 18px "Instrument Serif"';
-  ctx.fillStyle = TEXT_COLOR;
-  for (const line of textLines) {
-    ctx.fillText(line, tx, y);
-    y += 26;
-  }
-  y += 8;
-
-  // Date
-  if (t.created_at) {
-    const d = new Date(t.created_at);
-    const dateStr = d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' }) + ' · ' +
-                    d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-    ctx.font = '400 10px "DM Mono"';
-    ctx.fillStyle = MUTED;
-    ctx.fillText(dateStr.toUpperCase(), tx, y);
-  }
-  y += 20 + 20;
-
-  // ── Metrics ──
-  const metrics = [
-    { label: 'RETUITS', val: rt,      icon: '🔁' },
-    { label: 'REPLIES', val: replies, icon: '💬' },
-    { label: 'QUOTES',  val: quotes,  icon: '🗨️' },
-    { label: 'LIKES',   val: likes,   icon: '❤️' },
-  ];
-  const mW = (W - MARGIN * 2 - 30) / 4;
-  metrics.forEach((m, i) => {
-    const mx = MARGIN + i * (mW + 10);
-    let borderClr = BORDER;
-    let valClr = TEXT_COLOR;
-    if (ratioed && (i === 1 || i === 2)) { borderClr = 'rgba(232,65,44,0.4)'; valClr = RATIOED_CLR; }
-    if (i === 0) { borderClr = 'rgba(45,189,110,0.4)'; valClr = SAFE_CLR; }
-
-    ctx.fillStyle = SURFACE;
-    roundRect(ctx, mx, y, mW, 86, 4); ctx.fill();
-    ctx.strokeStyle = borderClr; ctx.lineWidth = 1;
-    roundRect(ctx, mx, y, mW, 86, 4); ctx.stroke();
-
-    ctx.font = '14px sans-serif';
-    ctx.fillStyle = TEXT_COLOR;
-    ctx.fillText(m.icon, mx + 12, y + 24);
-
-    ctx.font = '500 28px "Bebas Neue"';
-    ctx.fillStyle = valClr;
-    ctx.fillText(fmt(m.val), mx + 12, y + 58);
-
-    ctx.font = '400 9px "DM Mono"';
-    ctx.fillStyle = MUTED;
-    ctx.fillText(m.label, mx + 12, y + 74);
-  });
-  y += 86 + 16;
-
-  // ── Bar ──
-  const barW = W - MARGIN * 2;
-  const opposition = rt + (replies + quotes);
-  const rtPct = opposition > 0 ? (rt / opposition) : 0.5;
-
-  ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  roundRect(ctx, MARGIN, y, barW, 6, 3); ctx.fill();
-  ctx.fillStyle = ratioed ? RATIOED_CLR : SAFE_CLR;
-  roundRect(ctx, MARGIN, y, barW * rtPct, 6, 3); ctx.fill();
-  y += 6 + 10;
-
-  ctx.font = '400 9px "DM Mono"';
-  ctx.fillStyle = MUTED;
-  ctx.textAlign = 'left';
-  ctx.fillText('RTs', MARGIN, y);
-  ctx.textAlign = 'right';
-  ctx.fillText('REPLIES + QUOTES', W - MARGIN, y);
-  ctx.textAlign = 'left';
-  y += 20;
-
-  // ── Footer ──
-  const now = new Date();
-  const ts = now.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' +
-             now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  ctx.font = '400 9px "DM Mono"';
-  ctx.fillStyle = 'rgba(255,255,255,0.18)';
-  ctx.textAlign = 'left';
-  ctx.fillText('ratio.check  ·  generado: ' + ts + '  ·  datos: fxtwitter.com', MARGIN, H - 18);
-  ctx.textAlign = 'right';
-  ctx.fillText('x.com/' + (t.author?.screen_name || '') + '/status/' + (t.id || ''), W - MARGIN, H - 18);
-  ctx.textAlign = 'left';
-
-  return canvas;
-}
-
-async function downloadImg() {
-  const canvas = await buildCanvas();
-  if (!canvas) return;
-  const a = document.createElement('a');
-  a.download = 'ratio-check.png';
-  a.href = canvas.toDataURL('image/png');
-  a.click();
-}
-
-async function shareImg() {
-  const canvas = await buildCanvas();
-  if (!canvas) return;
-  canvas.toBlob(async (blob) => {
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': blob })
-      ]);
-      const btn = document.querySelector('.btn-secondary');
-      const orig = btn.textContent;
-      btn.textContent = 'Copiado ✓';
-      setTimeout(() => { btn.textContent = orig; }, 2000);
-    } catch {
-      alert('Tu navegador no soporta copiar imágenes. Usá Descargar.');
+        return data.tweet;
+      } catch (error) {
+        if (error.name === 'AbortError') throw new Error('timeout');
+        throw error;
+      } finally {
+        clearTimeout(timeoutId);
+      }
     }
-  }, 'image/png');
-}
 
-function wrapText(text, maxWidth, font) {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.font = font;
-  const words = text.split(' ');
-  const lines = [];
-  let line = '';
-  for (const word of words) {
-    const test = line ? line + ' ' + word : word;
-    if (ctx.measureText(test).width > maxWidth && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
+    async function analyze() {
+      if (isLoading) return;
+
+      const url = document.getElementById('tweet-url').value.trim();
+      currentData = null;
+      currentMetrics = null;
+      currentTweetUrl = '';
+
+      setError('');
+      resetResultState();
+
+      const parsed = parseTweetUrl(url);
+      if (!parsed) {
+        setError('URL no reconocida. Formato esperado: x.com/usuario/status/12345…');
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const tweet = await fetchTweet(parsed.username, parsed.id);
+        currentData = tweet;
+        currentTweetUrl = `https://x.com/${parsed.username}/status/${parsed.id}`;
+        renderResult(tweet);
+      } catch (error) {
+        const message = error && error.message === 'timeout'
+          ? 'La consulta tardó demasiado. Probá de nuevo en unos segundos.'
+          : `No se pudo obtener el tuit. Verificá que sea público. (${error.message})`;
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
-  if (line) lines.push(line);
-  return lines;
-}
 
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);    ctx.arcTo(x + w, y, x + w, y + r, r);
-  ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-  ctx.lineTo(x + r, y + h);    ctx.arcTo(x, y + h, x, y + h - r, r);
-  ctx.lineTo(x, y + r);        ctx.arcTo(x, y, x + r, y, r);
-  ctx.closePath();
-}
+    function renderResult(tweet) {
+      resetResultState();
 
-// Enter key
-document.getElementById('tweet-url').addEventListener('keydown', e => {
-  if (e.key === 'Enter') analyze();
-});
-</script>
+      const metrics = computeRatioMetrics(tweet);
+      currentMetrics = metrics;
+
+      document.getElementById('verdict').classList.add(`is-${metrics.verdict}`);
+      document.getElementById('verdict-label').textContent = metrics.verdictLabel;
+
+      const initials = document.getElementById('avatar-initials');
+      const avatarImg = document.getElementById('avatar-img');
+      const badge = document.getElementById('author-badge');
+
+      if (tweet.author) {
+        document.getElementById('author-name').textContent = tweet.author.name || '';
+        document.getElementById('author-handle').textContent = tweet.author.screen_name ? `@${tweet.author.screen_name}` : '';
+        initials.textContent = (tweet.author.name || '?').charAt(0).toUpperCase();
+        badge.style.display = metrics.verified ? 'inline-flex' : 'none';
+
+        if (tweet.author.avatar_url) {
+          avatarImg.onerror = () => {
+            avatarImg.style.display = 'none';
+            initials.style.display = 'inline';
+          };
+          avatarImg.src = tweet.author.avatar_url;
+          avatarImg.alt = tweet.author.name || 'Avatar';
+          avatarImg.style.display = 'block';
+          initials.style.display = 'none';
+        }
+      } else {
+        initials.textContent = '?';
+      }
+
+      document.getElementById('tweet-text').textContent = tweet.text || '';
+
+      if (tweet.created_at) {
+        const date = new Date(tweet.created_at);
+        document.getElementById('tweet-date').textContent =
+          `${date.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })} · ${date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`;
+      }
+
+      document.getElementById('tweet-replies-inline').textContent = fmt(metrics.replies);
+      document.getElementById('tweet-retweets-inline').textContent = fmt(metrics.rt);
+      document.getElementById('tweet-quotes-inline').textContent = fmt(metrics.quotes);
+      document.getElementById('tweet-likes-inline').textContent = fmt(metrics.likes);
+
+      document.getElementById('v-rep').textContent = fmt(metrics.replies);
+      document.getElementById('v-qt').textContent = fmt(metrics.quotes);
+      document.getElementById('v-lk').textContent = fmt(metrics.likes);
+      document.getElementById('v-rt').textContent = fmt(metrics.rt);
+
+      if (metrics.verdict === 'ratioed') {
+        document.getElementById('m-rep').classList.add('is-bad');
+        document.getElementById('m-qt').classList.add('is-bad');
+      }
+
+      if (metrics.verdict === 'safe') {
+        document.getElementById('m-lk').classList.add('is-good');
+        document.getElementById('m-rt').classList.add('is-good');
+      }
+
+      const marker = document.getElementById('axis-marker');
+      marker.style.left = `${metrics.markerPct.toFixed(1)}%`;
+      marker.style.background = metrics.verdict === 'ratioed'
+        ? 'var(--red)'
+        : metrics.verdict === 'safe'
+          ? 'var(--green)'
+          : 'var(--amber)';
+
+      document.getElementById('result').style.display = 'block';
+    }
+
+    function getShareText() {
+      if (!currentData || !currentMetrics || !currentTweetUrl) return '';
+      return `${currentMetrics.verdictLabel} en LA ESQUINA ONLINE. ${currentMetrics.verdictNote}. ${currentTweetUrl}`;
+    }
+
+    function shareOnX() {
+      const text = getShareText();
+      if (!text) return;
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+    }
+
+    function shareOnWhatsApp() {
+      const text = getShareText();
+      if (!text) return;
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+    }
+
+    async function copyLink() {
+      if (!currentTweetUrl) return;
+      try {
+        await navigator.clipboard.writeText(currentTweetUrl);
+        const btn = document.getElementById('copy-link-btn');
+        const original = btn.textContent;
+        btn.textContent = 'Copiado';
+        setTimeout(() => {
+          btn.textContent = original;
+        }, 1800);
+      } catch {
+        alert('No se pudo copiar el link.');
+      }
+    }
+
+    function setModalOpen(modalId, open) {
+      const modal = document.getElementById(modalId);
+      if (!modal) return;
+      modal.classList.toggle('is-active', open);
+      document.documentElement.classList.toggle('is-clipped', open);
+    }
+
+    document.querySelectorAll('[data-modal-target]').forEach(button => {
+      button.addEventListener('click', () => {
+        setModalOpen(button.dataset.modalTarget, true);
+      });
+    });
+
+    document.querySelectorAll('[data-close-modal]').forEach(element => {
+      element.addEventListener('click', () => {
+        const modal = element.closest('.modal');
+        if (modal) setModalOpen(modal.id, false);
+      });
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      document.querySelectorAll('.modal.is-active').forEach(modal => {
+        setModalOpen(modal.id, false);
+      });
+    });
+
+    document.getElementById('tweet-url').addEventListener('keydown', event => {
+      if (event.key === 'Enter') analyze();
+    });
+  </script>
 </body>
 </html>
