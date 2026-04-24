@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ratio Check</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0b;
+      --surface: #161614;
+      --border: rgba(255,255,255,0.08);
+      --text: #f0ede6;
+      --muted: #706e68;
+      --accent: #f0ede6;
+      --ratioed: #e8412c;
+      --safe: #2dbd6e;
+      --ratioed-bg: rgba(232,65,44,0.08);
+      --safe-bg: rgba(45,189,110,0.08);
+    }
+
+    html { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+    header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 14vw, 9rem);
+      letter-spacing: 0.04em;
+      line-height: 0.9;
+      color: var(--text);
+    }
+    header h1 span { color: var(--ratioed); }
+    header p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 1rem;
+    }
+
+    /* ── Input ── */
+    .input-wrap {
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 2rem;
+    }
+    .input-row {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .input-row:focus-within { border-color: rgba(255,255,255,0.3); }
+    .input-row input {
+      flex: 1;
+      background: var(--surface);
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      padding: 14px 16px;
+    }
+    .input-row input::placeholder { color: var(--muted); }
+    .input-row button {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      padding: 0 24px;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .input-row button:hover { background: #ccc; }
+    .input-row button:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+    .err-msg {
+      display: none;
+      margin-top: 10px;
+      font-size: 0.72rem;
+      color: var(--ratioed);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Result card ── */
+    #result {
+      display: none;
+      width: 100%;
+      max-width: 600px;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Verdict banner */
+    .verdict {
+      border-radius: 4px;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .verdict.ratioed { background: var(--ratioed-bg); border: 1px solid rgba(232,65,44,0.3); }
+    .verdict.safe    { background: var(--safe-bg);    border: 1px solid rgba(45,189,110,0.3); }
+    .verdict-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      line-height: 1;
+      letter-spacing: 0.06em;
+    }
+    .verdict.ratioed .verdict-label { color: var(--ratioed); }
+    .verdict.safe    .verdict-label { color: var(--safe); }
+    .verdict-desc {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.7;
+      text-align: right;
+    }
+
+    /* Tweet card */
+    .tweet-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+    }
+    .tweet-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
+    .tweet-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: #2a2a28;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      color: var(--muted);
+    }
+    .tweet-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .tweet-author-name {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .tweet-author-handle {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .tweet-text {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.1rem;
+      line-height: 1.65;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 1rem;
+    }
+    .tweet-date {
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* Metrics */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px;
+    }
+    .metric-icon { font-size: 14px; margin-bottom: 6px; display: block; }
+    .metric-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      line-height: 1;
+    }
+    .metric-lbl {
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .metric.highlight-bad  { border-color: rgba(232,65,44,0.4); }
+    .metric.highlight-bad .metric-val { color: var(--ratioed); }
+    .metric.highlight-good { border-color: rgba(45,189,110,0.4); }
+    .metric.highlight-good .metric-val { color: var(--safe); }
+
+    /* Ratio score bar */
+    .ratio-bar-wrap { }
+    .ratio-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .ratio-bar-track {
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+    .ratio-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      flex: 1;
+      padding: 13px;
+      border-radius: 4px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+    .btn-primary:hover { background: #ccc; border-color: #ccc; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.05); }
+
+    /* footer */
+    footer {
+      margin-top: auto;
+      padding-top: 4rem;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ── Canvas for export (hidden) ── */
+    #export-canvas { display: none; }
+
+    /* loading spinner */
+    .spinner {
+      display: none;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: var(--bg);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>RATIO<span>.</span>CHECK</h1>
+    <p>¿Lo ratiaron?&nbsp;&nbsp;Averigualo en segundos</p>
+  </header>
+
+  <div class="input-wrap">
+    <div class="input-row">
+      <input type="text" id="tweet-url" placeholder="https://x.com/usuario/status/…" autocomplete="off" />
+      <button id="analyze-btn" onclick="analyze()">
+        <span class="spinner" id="spinner"></span>
+        Analizar
+      </button>
+    </div>
+    <p class="err-msg" id="err-msg"></p>
+  </div>
+
+  <div id="result">
+    <div class="verdict" id="verdict">
+      <div class="verdict-label" id="verdict-label"></div>
+      <div class="verdict-desc" id="verdict-desc"></div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-author">
+        <div class="tweet-avatar" id="avatar-wrap">
+          <img id="avatar-img" src="" alt="" style="display:none;" />
+          <span id="avatar-initials"></span>
+        </div>
+        <div>
+          <div class="tweet-author-name" id="author-name"></div>
+          <div class="tweet-author-handle" id="author-handle"></div>
+        </div>
+      </div>
+      <div class="tweet-text" id="tweet-text"></div>
+      <div class="tweet-date" id="tweet-date"></div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric" id="m-rt">
+        <span class="metric-icon">🔁</span>
+        <div class="metric-val" id="v-rt">0</div>
+        <div class="metric-lbl">Retuits</div>
+      </div>
+      <div class="metric" id="m-rep">
+        <span class="metric-icon">💬</span>
+        <div class="metric-val" id="v-rep">0</div>
+        <div class="metric-lbl">Replies</div>
+      </div>
+      <div class="metric" id="m-qt">
+        <span class="metric-icon">🗨️</span>
+        <div class="metric-val" id="v-qt">0</div>
+        <div class="metric-lbl">Quotes</div>
+      </div>
+      <div class="metric" id="m-lk">
+        <span class="metric-icon">❤️</span>
+        <div class="metric-val" id="v-lk">0</div>
+        <div class="metric-lbl">Likes</div>
+      </div>
+    </div>
+
+    <div class="ratio-bar-wrap">
+      <div class="ratio-bar-label">
+        <span>RTs&nbsp;vs&nbsp;Replies+Quotes</span>
+        <span id="ratio-score-lbl"></span>
+      </div>
+      <div class="ratio-bar-track">
+        <div class="ratio-bar-fill" id="ratio-bar-fill"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="downloadImg()">Descargar imagen</button>
+      <button class="btn btn-secondary" onclick="shareImg()">Copiar al portapapeles</button>
+    </div>
+  </div>
+
+  <canvas id="export-canvas"></canvas>
+
+  <footer>
+    ratio.check &nbsp;·&nbsp; datos vía <a href="https://fxtwitter.com" target="_blank">fxtwitter</a>
+  </footer>
+
+<script>
+const fmt = n => (n || 0).toLocaleString('es-AR');
+
+function parseTweetUrl(url) {
+  const m = url.match(/(?:twitter\.com|x\.com)\/([^/?#]+)\/status\/(\d+)/);
+  return m ? { username: m[1], id: m[2] } : null;
+}
+
+function setError(msg) {
+  const el = document.getElementById('err-msg');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function setLoading(on) {
+  const btn = document.getElementById('analyze-btn');
+  const sp  = document.getElementById('spinner');
+  btn.disabled = on;
+  sp.style.display = on ? 'inline-block' : 'none';
+  btn.textContent = on ? '' : 'Analizar';
+  if (on) btn.prepend(sp);
+}
+
+let currentData = null;
+
+async function analyze() {
+  const url = document.getElementById('tweet-url').value.trim();
+  setError('');
+  document.getElementById('result').style.display = 'none';
+
+  const parsed = parseTweetUrl(url);
+  if (!parsed) {
+    setError('URL no reconocida. Formato esperado: x.com/usuario/status/12345…');
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const res = await fetch(`https://api.fxtwitter.com/${parsed.username}/status/${parsed.id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.tweet) throw new Error('No se encontró el tuit');
+    currentData = data.tweet;
+    renderResult(data.tweet);
+  } catch (e) {
+    setError('No se pudo obtener el tuit. Verificá que sea público. (' + e.message + ')');
+  } finally {
+    setLoading(false);
+  }
+}
+
+function renderResult(t) {
+  const rt      = t.retweets || 0;
+  const replies = t.replies  || 0;
+  const quotes  = t.quotes   || 0;
+  const likes   = t.likes    || 0;
+  const ratioed = (replies + quotes) > rt;
+  const total   = rt + replies + quotes + likes;
+  const score   = rt > 0 ? ((replies + quotes) / rt).toFixed(2) : '∞';
+
+  // Verdict
+  const vbox = document.getElementById('verdict');
+  vbox.className = 'verdict ' + (ratioed ? 'ratioed' : 'safe');
+  document.getElementById('verdict-label').textContent = ratioed ? '🔥 RATIADO' : '✅ SAFE';
+  document.getElementById('verdict-desc').innerHTML = ratioed
+    ? `Replies + quotes<br><strong>${fmt(replies + quotes)}</strong> > RTs <strong>${fmt(rt)}</strong>`
+    : `RTs <strong>${fmt(rt)}</strong><br>> Replies + quotes <strong>${fmt(replies + quotes)}</strong>`;
+
+  // Tweet card
+  if (t.author) {
+    document.getElementById('author-name').textContent   = t.author.name || '';
+    document.getElementById('author-handle').textContent = '@' + (t.author.screen_name || '');
+    document.getElementById('avatar-initials').textContent = (t.author.name || '?').charAt(0).toUpperCase();
+    const img = document.getElementById('avatar-img');
+    if (t.author.avatar_url) {
+      img.src = t.author.avatar_url;
+      img.style.display = 'block';
+      document.getElementById('avatar-initials').style.display = 'none';
+    }
+  }
+  document.getElementById('tweet-text').textContent = t.text || '';
+  if (t.created_at) {
+    const d = new Date(t.created_at);
+    document.getElementById('tweet-date').textContent =
+      d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' }) + ' · ' +
+      d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Metrics
+  document.getElementById('v-rt').textContent  = fmt(rt);
+  document.getElementById('v-rep').textContent = fmt(replies);
+  document.getElementById('v-qt').textContent  = fmt(quotes);
+  document.getElementById('v-lk').textContent  = fmt(likes);
+
+  ['m-rt','m-rep','m-qt','m-lk'].forEach(id => {
+    document.getElementById(id).className = 'metric';
+  });
+  if (ratioed) {
+    document.getElementById('m-rep').classList.add('highlight-bad');
+    document.getElementById('m-qt').classList.add('highlight-bad');
+    document.getElementById('m-rt').classList.add('highlight-good');
+  } else {
+    document.getElementById('m-rt').classList.add('highlight-good');
+  }
+
+  // Bar
+  const opposition = rt + (replies + quotes);
+  const rtPct = opposition > 0 ? (rt / opposition) * 100 : 50;
+  const fill  = document.getElementById('ratio-bar-fill');
+  fill.style.width      = rtPct.toFixed(1) + '%';
+  fill.style.background = ratioed ? '#e8412c' : '#2dbd6e';
+  document.getElementById('ratio-score-lbl').textContent = `Score: ${score}`;
+
+  document.getElementById('result').style.display = 'flex';
+}
+
+/* ── Canvas export ── */
+
+async function loadImageAsBase64(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch { return null; }
+}
+
+async function buildCanvas() {
+  const t = currentData;
+  if (!t) return null;
+
+  const rt      = t.retweets || 0;
+  const replies = t.replies  || 0;
+  const quotes  = t.quotes   || 0;
+  const likes   = t.likes    || 0;
+  const ratioed = (replies + quotes) > rt;
+  const score   = rt > 0 ? ((replies + quotes) / rt).toFixed(2) : '∞';
+
+  const W = 700, MARGIN = 36;
+  const canvas = document.getElementById('export-canvas');
+
+  // Fonts via canvas (Bebas Neue loaded via Google Fonts)
+  await document.fonts.ready;
+
+  const TEXT_COLOR   = '#f0ede6';
+  const MUTED        = '#706e68';
+  const SURFACE      = '#161614';
+  const BORDER       = 'rgba(255,255,255,0.08)';
+  const RATIOED_CLR  = '#e8412c';
+  const SAFE_CLR     = '#2dbd6e';
+  const verdict_clr  = ratioed ? RATIOED_CLR : SAFE_CLR;
+
+  // Load avatar
+  let avatarImg = null;
+  if (t.author?.avatar_url) {
+    const b64 = await loadImageAsBase64(t.author.avatar_url);
+    if (b64) {
+      avatarImg = await new Promise(resolve => {
+        const img = new Image();
+        img.onload  = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = b64;
+      });
+    }
+  }
+
+  // Measure text to get height
+  const textLines = wrapText(t.text || '', W - MARGIN * 2 - 32, '18px "Instrument Serif"');
+  const H = 36 + 80 + 24 + 20 + 16 + textLines.length * 26 + 16 + 20 + 36 + 16 + 96 + 16 + 40 + 36 + 60;
+
+  canvas.width  = W * 2;
+  canvas.height = H * 2;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+
+  // BG
+  ctx.fillStyle = '#0d0d0b';
+  ctx.fillRect(0, 0, W, H);
+
+  let y = MARGIN;
+
+  // ── Verdict box ──
+  const vboxH = 80;
+  ctx.fillStyle = ratioed ? 'rgba(232,65,44,0.08)' : 'rgba(45,189,110,0.08)';
+  roundRect(ctx, MARGIN, y, W - MARGIN * 2, vboxH, 4);
+  ctx.fill();
+  ctx.strokeStyle = ratioed ? 'rgba(232,65,44,0.35)' : 'rgba(45,189,110,0.35)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, MARGIN, y, W - MARGIN * 2, vboxH, 4);
+  ctx.stroke();
+
+  ctx.font = '500 52px "Bebas Neue"';
+  ctx.fillStyle = verdict_clr;
+  ctx.textAlign = 'left';
+  ctx.fillText(ratioed ? '🔥  RATIADO' : '✅  SAFE', MARGIN + 20, y + 50);
+
+  // ratio score top-right
+  ctx.font = '400 11px "DM Mono"';
+  ctx.fillStyle = ratioed ? 'rgba(232,65,44,0.7)' : 'rgba(45,189,110,0.7)';
+  ctx.textAlign = 'right';
+  const desc = ratioed
+    ? `replies+quotes (${fmt(replies + quotes)}) > RTs (${fmt(rt)})`
+    : `RTs (${fmt(rt)}) > replies+quotes (${fmt(replies + quotes)})`;
+  ctx.fillText(desc.toUpperCase(), W - MARGIN - 20, y + 36);
+  ctx.fillText(`SCORE: ${score}`, W - MARGIN - 20, y + 54);
+  ctx.textAlign = 'left';
+
+  y += vboxH + 16;
+
+  // ── Tweet card ──
+  const tweetCardH = 24 + textLines.length * 26 + 16 + 20 + 36 + 16;
+  ctx.fillStyle = SURFACE;
+  roundRect(ctx, MARGIN, y, W - MARGIN * 2, 20 + 44 + 16 + tweetCardH, 4);
+  ctx.fill();
+  ctx.strokeStyle = BORDER;
+  ctx.lineWidth = 1;
+  roundRect(ctx, MARGIN, y, W - MARGIN * 2, 20 + 44 + 16 + tweetCardH, 4);
+  ctx.stroke();
+
+  const tx = MARGIN + 20;
+  y += 20;
+
+  // Avatar
+  const avatarR = 22;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(tx + avatarR, y + avatarR, avatarR, 0, Math.PI * 2);
+  ctx.clip();
+  if (avatarImg) {
+    ctx.drawImage(avatarImg, tx, y, avatarR * 2, avatarR * 2);
+  } else {
+    ctx.fillStyle = '#2a2a28';
+    ctx.fillRect(tx, y, avatarR * 2, avatarR * 2);
+    ctx.font = '500 18px "Bebas Neue"';
+    ctx.fillStyle = MUTED;
+    ctx.textAlign = 'center';
+    ctx.fillText((t.author?.name || '?').charAt(0).toUpperCase(), tx + avatarR, y + avatarR + 7);
+    ctx.textAlign = 'left';
+  }
+  ctx.restore();
+
+  // Author
+  const ax = tx + avatarR * 2 + 12;
+  ctx.font = '400 15px "Instrument Serif"';
+  ctx.fillStyle = TEXT_COLOR;
+  ctx.fillText(t.author?.name || '', ax, y + 17);
+  ctx.font = '400 11px "DM Mono"';
+  ctx.fillStyle = MUTED;
+  ctx.fillText('@' + (t.author?.screen_name || ''), ax, y + 34);
+
+  y += 44 + 16;
+
+  // Tweet text
+  ctx.font = '400 18px "Instrument Serif"';
+  ctx.fillStyle = TEXT_COLOR;
+  for (const line of textLines) {
+    ctx.fillText(line, tx, y);
+    y += 26;
+  }
+  y += 8;
+
+  // Date
+  if (t.created_at) {
+    const d = new Date(t.created_at);
+    const dateStr = d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' }) + ' · ' +
+                    d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+    ctx.font = '400 10px "DM Mono"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText(dateStr.toUpperCase(), tx, y);
+  }
+  y += 20 + 20;
+
+  // ── Metrics ──
+  const metrics = [
+    { label: 'RETUITS', val: rt,      icon: '🔁' },
+    { label: 'REPLIES', val: replies, icon: '💬' },
+    { label: 'QUOTES',  val: quotes,  icon: '🗨️' },
+    { label: 'LIKES',   val: likes,   icon: '❤️' },
+  ];
+  const mW = (W - MARGIN * 2 - 30) / 4;
+  metrics.forEach((m, i) => {
+    const mx = MARGIN + i * (mW + 10);
+    let borderClr = BORDER;
+    let valClr = TEXT_COLOR;
+    if (ratioed && (i === 1 || i === 2)) { borderClr = 'rgba(232,65,44,0.4)'; valClr = RATIOED_CLR; }
+    if (i === 0) { borderClr = 'rgba(45,189,110,0.4)'; valClr = SAFE_CLR; }
+
+    ctx.fillStyle = SURFACE;
+    roundRect(ctx, mx, y, mW, 86, 4); ctx.fill();
+    ctx.strokeStyle = borderClr; ctx.lineWidth = 1;
+    roundRect(ctx, mx, y, mW, 86, 4); ctx.stroke();
+
+    ctx.font = '14px sans-serif';
+    ctx.fillStyle = TEXT_COLOR;
+    ctx.fillText(m.icon, mx + 12, y + 24);
+
+    ctx.font = '500 28px "Bebas Neue"';
+    ctx.fillStyle = valClr;
+    ctx.fillText(fmt(m.val), mx + 12, y + 58);
+
+    ctx.font = '400 9px "DM Mono"';
+    ctx.fillStyle = MUTED;
+    ctx.fillText(m.label, mx + 12, y + 74);
+  });
+  y += 86 + 16;
+
+  // ── Bar ──
+  const barW = W - MARGIN * 2;
+  const opposition = rt + (replies + quotes);
+  const rtPct = opposition > 0 ? (rt / opposition) : 0.5;
+
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  roundRect(ctx, MARGIN, y, barW, 6, 3); ctx.fill();
+  ctx.fillStyle = ratioed ? RATIOED_CLR : SAFE_CLR;
+  roundRect(ctx, MARGIN, y, barW * rtPct, 6, 3); ctx.fill();
+  y += 6 + 10;
+
+  ctx.font = '400 9px "DM Mono"';
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'left';
+  ctx.fillText('RTs', MARGIN, y);
+  ctx.textAlign = 'right';
+  ctx.fillText('REPLIES + QUOTES', W - MARGIN, y);
+  ctx.textAlign = 'left';
+  y += 20;
+
+  // ── Footer ──
+  const now = new Date();
+  const ts = now.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' +
+             now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  ctx.font = '400 9px "DM Mono"';
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.textAlign = 'left';
+  ctx.fillText('ratio.check  ·  generado: ' + ts + '  ·  datos: fxtwitter.com', MARGIN, H - 18);
+  ctx.textAlign = 'right';
+  ctx.fillText('x.com/' + (t.author?.screen_name || '') + '/status/' + (t.id || ''), W - MARGIN, H - 18);
+  ctx.textAlign = 'left';
+
+  return canvas;
+}
+
+async function downloadImg() {
+  const canvas = await buildCanvas();
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.download = 'ratio-check.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+async function shareImg() {
+  const canvas = await buildCanvas();
+  if (!canvas) return;
+  canvas.toBlob(async (blob) => {
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob })
+      ]);
+      const btn = document.querySelector('.btn-secondary');
+      const orig = btn.textContent;
+      btn.textContent = 'Copiado ✓';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    } catch {
+      alert('Tu navegador no soporta copiar imágenes. Usá Descargar.');
+    }
+  }, 'image/png');
+}
+
+function wrapText(text, maxWidth, font) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = font;
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+  for (const word of words) {
+    const test = line ? line + ' ' + word : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);    ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);    ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);        ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+// Enter key
+document.getElementById('tweet-url').addEventListener('keydown', e => {
+  if (e.key === 'Enter') analyze();
+});
+</script>
+</body>
+</html>
