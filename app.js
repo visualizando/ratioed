@@ -365,13 +365,27 @@
 
     function getShareText(shareUrl = currentTweetUrl) {
       if (!currentData || !currentMetrics || !currentTweetUrl) return '';
-      return `Analicé respuestas, citas, retuits y favs en laesquina.visualizando.ar y el veredicto es que la calle online ${currentMetrics.shareVerdictLabel} este tuit. Miralo acá: ${shareUrl}`;
+      return `Analice respuestas, citas, retuits y favs en laesquina.visualizando.ar. Veredicto: la calle online ${currentMetrics.shareVerdictLabel} este tuit. Miralo aca: ${shareUrl}`;
+    }
+
+    function getXShareText() {
+      if (!currentData || !currentMetrics || !currentTweetUrl) return '';
+
+      const MAX_X_POST_LENGTH = 256;
+      const candidates = [
+        `Analizando las respuestas, citas, retuits y favs en laesquina.visualizando.ar el veredicto es que la calle online ${currentMetrics.shareVerdictLabel} este tuit:`,
+        `Analizando respuestas, citas, retuits y favs en laesquina.visualizando.ar el veredicto es que la calle online ${currentMetrics.shareVerdictLabel} este tuit:`,
+        `En laesquina.visualizando.ar el veredicto es que la calle online ${currentMetrics.shareVerdictLabel} este tuit:`,
+        `La calle online ${currentMetrics.shareVerdictLabel} este tuit:`,
+      ];
+
+      return candidates.find(candidate => candidate.length <= MAX_X_POST_LENGTH) || candidates.at(-1);
     }
 
     function shareOnX() {
-      const text = getShareText(currentTweetUrl);
+      const text = getXShareText();
       if (!text) return;
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(currentTweetUrl)}`, '_blank', 'noopener');
     }
 
     function shareOnWhatsApp() {
