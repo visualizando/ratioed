@@ -59,9 +59,10 @@
       const replies = normalizeCount(tweet?.replies);
       const quotes = normalizeCount(tweet?.quotes);
       const likes = normalizeCount(tweet?.likes);
-      const opposition = replies + quotes;
-      const sample = rt + opposition;
-      const sentimentScore = sample > 0 ? Math.round(((rt - opposition) / sample) * 100) : 0;
+      const opposition = replies + (quotes * 2);
+      const support = rt + (likes * 0.5);
+      const sample = support + opposition;
+      const sentimentScore = sample > 0 ? Math.round(((support - opposition) / sample) * 100) : 0;
       const markerPct = sample > 0 ? ((sentimentScore + 100) / 2) : 50;
 
       if (sample === 0) {
