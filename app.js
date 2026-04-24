@@ -25,6 +25,7 @@
 
       const input = document.getElementById('tweet-url');
       input.value = initialUrl.trim();
+      updateClearButtonVisibility();
       analyze();
     }
 
@@ -165,6 +166,12 @@
       btn.lastChild.textContent = on ? 'Analizando' : 'Analizar';
     }
 
+    function updateClearButtonVisibility() {
+      const clearButton = document.getElementById('clear-search-btn');
+      const input = document.getElementById('tweet-url');
+      clearButton.classList.toggle('is-visible', Boolean(input.value.trim()));
+    }
+
     function resetResultState() {
       document.getElementById('result').style.display = 'none';
       document.getElementById('verdict').className = 'analysis-card';
@@ -199,6 +206,24 @@
       const marker = document.getElementById('axis-marker');
       marker.style.left = '50%';
       marker.style.background = 'var(--amber)';
+    }
+
+    function clearTweetInput() {
+      if (isLoading) return;
+
+      currentData = null;
+      currentMetrics = null;
+      currentTweetUrl = '';
+
+      const input = document.getElementById('tweet-url');
+      input.value = '';
+
+      setError('');
+      resetResultState();
+      setHeroVisibility(true);
+      syncAppUrl('');
+      updateClearButtonVisibility();
+      input.focus();
     }
 
     async function fetchTweet(username, id) {
@@ -338,19 +363,19 @@
       document.getElementById('result').style.display = 'block';
     }
 
-    function getShareText() {
+    function getShareText(shareUrl = currentTweetUrl) {
       if (!currentData || !currentMetrics || !currentTweetUrl) return '';
-      return `Analicé respuestas, citas, retuits y favs en laesquina.visualizando.ar y el veredicto es que la calle online ${currentMetrics.shareVerdictLabel} el siguiente tuit: ${currentTweetUrl}`;
+      return `Analicé respuestas, citas, retuits y favs en laesquina.visualizando.ar y el veredicto es que la calle online ${currentMetrics.shareVerdictLabel} este tuit. Miralo acá: ${shareUrl}`;
     }
 
     function shareOnX() {
-      const text = getShareText();
+      const text = getShareText(currentTweetUrl);
       if (!text) return;
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
     }
 
     function shareOnWhatsApp() {
-      const text = getShareText();
+      const text = getShareText(buildAppUrl(currentTweetUrl));
       if (!text) return;
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
     }
@@ -472,5 +497,15 @@
     document.getElementById('tweet-url').addEventListener('keydown', event => {
       if (event.key === 'Enter') analyze();
     });
+
+    document.getElementById('tweet-url').addEventListener('input', () => {
+      updateClearButtonVisibility();
+    });
+
+    document.getElementById('clear-search-btn').addEventListener('click', () => {
+      clearTweetInput();
+    });
+
+    updateClearButtonVisibility();
 
     loadTweetFromQuery();

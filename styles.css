@@ -170,18 +170,59 @@
       display: flex;
     }
 
+    .search-input-wrap {
+      position: relative;
+      align-items: center;
+    }
+
     .input.ratio-input {
+      width: 100%;
       min-height: 64px;
       border: none;
       box-shadow: none;
       background: transparent;
-      padding-inline: 1.2rem;
+      padding-inline: 1.2rem 3.9rem;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.92rem;
     }
 
     .input.ratio-input:focus {
       box-shadow: none;
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      z-index: 2;
+      right: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2rem;
+      height: 2rem;
+      border: none;
+      border-radius: 999px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(49, 101, 140, 0.12);
+      color: var(--blue-dark);
+      cursor: pointer;
+      pointer-events: auto;
+      font-size: 1.25rem;
+      line-height: 1;
+      transition: background 120ms ease, opacity 120ms ease;
+    }
+
+    .clear-search-btn.is-visible {
+      display: inline-flex;
+    }
+
+    .clear-search-btn:hover {
+      background: rgba(49, 101, 140, 0.2);
+    }
+
+    .clear-search-btn:focus-visible {
+      outline: 2px solid rgba(49, 101, 140, 0.4);
+      outline-offset: 2px;
     }
 
     .button.analyze-btn {
@@ -678,6 +719,10 @@
 
       .search-box .control {
         width: 100%;
+      }
+
+      .clear-search-btn {
+        right: 0.9rem;
       }
 
       .button.analyze-btn {
