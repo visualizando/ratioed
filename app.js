@@ -37,7 +37,6 @@
       const likes = normalizeCount(tweet?.likes);
       const opposition = replies + quotes;
       const sample = rt + opposition;
-      const ratioScore = rt > 0 ? opposition / rt : (opposition > 0 ? Number.POSITIVE_INFINITY : null);
       const sentimentScore = sample > 0 ? Math.round(((rt - opposition) / sample) * 100) : 0;
       const markerPct = sample > 0 ? ((sentimentScore + 100) / 2) : 50;
 
@@ -51,9 +50,7 @@
           sample,
           verdict: 'neutral',
           verdictLabel: 'Sin muestra',
-          verdictDesc: 'Todavía no hay suficiente movimiento para leer el clima del tuit.',
-          verdictNote: 'Hacen falta replies, quote tweets o retuits para ubicarlo en el eje.',
-          scoreLabel: 'Indice social n/d',
+          shareVerdictLabel: 'NO SE SABE',
           sentimentScore,
           markerPct,
           verified: false,
@@ -70,9 +67,7 @@
           sample,
           verdict: 'neutral',
           verdictLabel: 'Zona gris',
-          verdictDesc: 'Todavía hay poco volumen para sacar una conclusión firme.',
-          verdictNote: `Solo aparecen ${fmt(sample)} interacciones útiles entre replies, quotes y retuits.`,
-          scoreLabel: `Indice social ${sentimentScore > 0 ? '+' : ''}${sentimentScore}`,
+          shareVerdictLabel: 'ESTA DIVIDIDA',
           sentimentScore,
           markerPct,
           verified: false,
@@ -81,24 +76,24 @@
 
       let verdict = 'neutral';
       let verdictLabel = 'Quedó dividido';
-      let verdictDesc = 'El tuit quedó bastante parejo entre apoyo y crítica.';
+      let shareVerdictLabel = 'ESTA DIVIDIDA';
 
       if (sentimentScore <= -35) {
         verdict = 'ratioed';
         verdictLabel = 'Lo re bardean';
-        verdictDesc = 'Las respuestas críticas pesan mucho más que el apoyo y empujan el tuit hacia el extremo rojo.';
+        shareVerdictLabel = 'RE BARDEA';
       } else if (sentimentScore < -10) {
         verdict = 'ratioed';
         verdictLabel = 'Lo bardean';
-        verdictDesc = 'Hay más crítica que banca, aunque sin llegar a una paliza total.';
+        shareVerdictLabel = 'BARDEA';
       } else if (sentimentScore >= 35) {
         verdict = 'safe';
         verdictLabel = 'Lo re bancan';
-        verdictDesc = 'El apoyo domina con claridad y el tuit se acomoda del lado verde.';
+        shareVerdictLabel = 'RE BANCA';
       } else if (sentimentScore > 10) {
         verdict = 'safe';
         verdictLabel = 'La gente banca';
-        verdictDesc = 'El apoyo gana por un margen claro, aunque no absoluto.';
+        shareVerdictLabel = 'BANCA';
       }
 
       return {
@@ -110,13 +105,30 @@
         sample,
         verdict,
         verdictLabel,
-        verdictDesc,
-        verdictNote: `Replies + quote tweets: ${fmt(opposition)} · Retuits: ${fmt(rt)} · Ratio replies/RT: ${ratioScore === Number.POSITIVE_INFINITY ? '∞' : ratioScore.toFixed(2)}`,
-        scoreLabel: `Indice social ${sentimentScore > 0 ? '+' : ''}${sentimentScore}`,
+        shareVerdictLabel,
         sentimentScore,
         markerPct,
         verified: Boolean(tweet?.author?.verified || tweet?.author?.blue_verified || tweet?.author?.is_blue_verified),
       };
+    }
+
+    function wrapCanvasText(context, text, maxWidth) {
+      const words = String(text || '').split(/\s+/).filter(Boolean);
+      const lines = [];
+      let line = '';
+
+      for (const word of words) {
+        const candidate = line ? `${line} ${word}` : word;
+        if (context.measureText(candidate).width > maxWidth && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = candidate;
+        }
+      }
+
+      if (line) lines.push(line);
+      return lines.length ? lines : [''];
     }
 
     function setError(message) {
@@ -323,7 +335,7 @@
 
     function getShareText() {
       if (!currentData || !currentMetrics || !currentTweetUrl) return '';
-      return `${currentMetrics.verdictLabel} en LA ESQUINA ONLINE. ${currentMetrics.verdictNote}. ${currentTweetUrl}`;
+      return `Analicé respuestas, citas, retuits y favs en laesquina.visualizando.ar y el veredicto es que la calle online ${currentMetrics.shareVerdictLabel} el siguiente tuit: ${currentTweetUrl}`;
     }
 
     function shareOnX() {
@@ -351,6 +363,165 @@
       } catch {
         alert('No se pudo copiar el link.');
       }
+    }
+
+    async function generateImage() {
+      if (!currentData || !currentMetrics) return;
+
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return;
+
+      const width = 1400;
+      const padding = 80;
+      const cardWidth = width - padding * 2;
+      const tweetText = currentData.text || '';
+      const authorName = currentData.author?.name || '';
+      const authorHandle = currentData.author?.screen_name ? `@${currentData.author.screen_name}` : '';
+      const generatedText = formatGeneratedStamp(new Date());
+
+      context.font = '400 42px "IBM Plex Sans"';
+      const tweetLines = wrapCanvasText(context, tweetText, cardWidth - 100);
+      const tweetHeight = Math.max(220, 150 + tweetLines.length * 56);
+      const height = 1180 + Math.max(0, tweetHeight - 220);
+
+      canvas.width = width;
+      canvas.height = height;
+
+      context.fillStyle = '#edf6fc';
+      context.fillRect(0, 0, width, height);
+
+      context.fillStyle = '#ffffff';
+      context.strokeStyle = 'rgba(49, 101, 140, 0.16)';
+      context.lineWidth = 2;
+      roundRect(context, padding, 60, cardWidth, height - 120, 36);
+      context.fill();
+      context.stroke();
+
+      context.fillStyle = '#6c8194';
+      context.font = '500 24px "IBM Plex Mono"';
+      context.textAlign = 'center';
+      context.fillText('TWEET ORIGINAL:', width / 2, 120);
+
+      context.fillStyle = '#ffffff';
+      context.strokeStyle = 'rgba(49, 101, 140, 0.18)';
+      roundRect(context, padding + 26, 150, cardWidth - 52, tweetHeight, 28);
+      context.fill();
+      context.stroke();
+
+      const tweetLeft = padding + 70;
+      let y = 220;
+
+      context.fillStyle = '#274c69';
+      context.font = '700 34px "IBM Plex Sans"';
+      context.textAlign = 'left';
+      context.fillText(authorName, tweetLeft, y);
+      y += 42;
+      context.fillStyle = '#6c8194';
+      context.font = '400 26px "IBM Plex Sans"';
+      context.fillText(authorHandle, tweetLeft, y);
+      y += 54;
+
+      context.fillStyle = '#274c69';
+      context.font = '400 42px "IBM Plex Sans"';
+      for (const line of tweetLines) {
+        context.fillText(line, tweetLeft, y);
+        y += 56;
+      }
+
+      const analysisTop = 150 + tweetHeight + 32;
+      context.fillStyle = '#ffffff';
+      context.strokeStyle = 'rgba(49, 101, 140, 0.18)';
+      roundRect(context, padding + 26, analysisTop, cardWidth - 52, 360, 28);
+      context.fill();
+      context.stroke();
+
+      context.fillStyle = currentMetrics.verdict === 'ratioed'
+        ? '#e34c43'
+        : currentMetrics.verdict === 'safe'
+          ? '#4c8f63'
+          : '#274c69';
+      context.font = '700 84px "IBM Plex Sans"';
+      context.textAlign = 'center';
+      context.fillText(currentMetrics.verdictLabel.toUpperCase(), width / 2, analysisTop + 120);
+
+      const trackLeft = padding + 80;
+      const trackTop = analysisTop + 176;
+      const trackWidth = cardWidth - 160;
+      const gradient = context.createLinearGradient(trackLeft, 0, trackLeft + trackWidth, 0);
+      gradient.addColorStop(0, '#e34c43');
+      gradient.addColorStop(0.5, '#b6bec6');
+      gradient.addColorStop(1, '#4c8f63');
+      context.fillStyle = gradient;
+      roundRect(context, trackLeft, trackTop, trackWidth, 12, 999);
+      context.fill();
+
+      const markerX = trackLeft + (trackWidth * currentMetrics.markerPct / 100);
+      context.fillStyle = currentMetrics.verdict === 'ratioed'
+        ? '#e34c43'
+        : currentMetrics.verdict === 'safe'
+          ? '#4c8f63'
+          : '#b69757';
+      context.beginPath();
+      context.arc(markerX, trackTop + 6, 18, 0, Math.PI * 2);
+      context.fill();
+      context.strokeStyle = '#ffffff';
+      context.lineWidth = 4;
+      context.stroke();
+
+      context.fillStyle = '#274c69';
+      context.font = '700 22px "IBM Plex Mono"';
+      context.textAlign = 'left';
+      context.fillText('LO PUTEAN', trackLeft, trackTop - 18);
+      context.textAlign = 'right';
+      context.fillText('LO BANCAN', trackLeft + trackWidth, trackTop - 18);
+
+      const metricTop = analysisTop + 230;
+      const metricWidth = (trackWidth - 36) / 4;
+      const metrics = [
+        { label: 'COMMENTS', value: fmt(currentMetrics.replies), good: false },
+        { label: 'QUOTE TWEETS', value: fmt(currentMetrics.quotes), good: false },
+        { label: 'FAVS', value: fmt(currentMetrics.likes), good: currentMetrics.verdict === 'safe' },
+        { label: 'RETUITS', value: fmt(currentMetrics.rt), good: currentMetrics.verdict === 'safe' },
+      ];
+
+      metrics.forEach((metric, index) => {
+        const metricLeft = trackLeft + index * (metricWidth + 12);
+        context.fillStyle = 'rgba(255,255,255,0.9)';
+        roundRect(context, metricLeft, metricTop, metricWidth, 84, 18);
+        context.fill();
+        context.fillStyle = '#6c8194';
+        context.font = '500 18px "IBM Plex Mono"';
+        context.textAlign = 'center';
+        context.fillText(metric.label, metricLeft + metricWidth / 2, metricTop + 28);
+        context.fillStyle = metric.good ? '#4c8f63' : '#274c69';
+        context.font = '500 34px "IBM Plex Sans"';
+        context.fillText(metric.value, metricLeft + metricWidth / 2, metricTop + 64);
+      });
+
+      context.fillStyle = 'rgba(47, 103, 143, 0.52)';
+      context.font = '500 18px "IBM Plex Mono"';
+      context.textAlign = 'center';
+      context.fillText(generatedText, width / 2, analysisTop + 340);
+
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'la-esquina-online.png';
+      link.click();
+    }
+
+    function roundRect(context, x, y, width, height, radius) {
+      context.beginPath();
+      context.moveTo(x + radius, y);
+      context.lineTo(x + width - radius, y);
+      context.arcTo(x + width, y, x + width, y + radius, radius);
+      context.lineTo(x + width, y + height - radius);
+      context.arcTo(x + width, y + height, x + width - radius, y + height, radius);
+      context.lineTo(x + radius, y + height);
+      context.arcTo(x, y + height, x, y + height - radius, radius);
+      context.lineTo(x, y + radius);
+      context.arcTo(x, y, x + radius, y, radius);
+      context.closePath();
     }
 
     function setModalOpen(modalId, open) {

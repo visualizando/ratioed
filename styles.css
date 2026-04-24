@@ -132,10 +132,9 @@
     .score-chip,
     .footer-note {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
+      font-size: 0.85rem;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--ink);
     }
 
     .hero h1 {
@@ -392,7 +391,7 @@
       position: relative;
       height: 8px;
       border-radius: 999px;
-      background: linear-gradient(90deg, var(--red) 0%, #e4ac73 24%, #d9e8f4 50%, #87b9d8 76%, var(--green) 100%);
+      background: linear-gradient(90deg, var(--red) 0%, #b6bec6 50%, var(--green) 100%);
     }
 
     .axis-marker {
@@ -478,7 +477,7 @@
     }
 
     .metric-card.is-bad {
-      background: rgba(239, 83, 80, 0.04);
+      background: transparent;
     }
 
     .metric-card.is-bad .metric-value {
@@ -486,7 +485,7 @@
     }
 
     .metric-card.is-good {
-      background: rgba(90, 156, 111, 0.04);
+      background: transparent;
     }
 
     .metric-card.is-good .metric-value {
@@ -494,15 +493,15 @@
     }
 
     .analysis-card.is-ratioed {
-      background: rgba(239, 83, 80, 0.08);
+      background: var(--paper);
     }
 
     .analysis-card.is-safe {
-      background: rgba(90, 156, 111, 0.08);
+      background: var(--paper);
     }
 
     .analysis-card.is-neutral {
-      background: rgba(72, 163, 223, 0.08);
+      background: var(--paper);
     }
 
     .analysis-card.is-ratioed .verdict-title {
@@ -546,7 +545,7 @@
 
     .share-actions {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 0.75rem;
       margin-top: 0;
     }
