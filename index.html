@@ -51,7 +51,7 @@
       </section>
 
       <section class="result-shell" id="result">
-        <div class="result-frame">
+        <div class="result-frame" id="export-card">
           <div class="result-stack">
             <p class="frame-kicker mono-kicker">Tweet original:</p>
 
@@ -125,7 +125,7 @@
               <p class="verdict-generated" id="verdict-generated"></p>
             </section>
 
-            <section class="share-card">
+            <section class="share-card" data-export-ignore="true">
               <p class="frame-kicker mono-kicker" style="margin-bottom:0.75rem;">Compartí el resultado</p>
               <div class="share-actions">
                 <button class="button" id="share-x-btn" onclick="shareOnX()">X (Twitter)</button>
@@ -190,6 +190,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

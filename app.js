@@ -112,25 +112,6 @@
       };
     }
 
-    function wrapCanvasText(context, text, maxWidth) {
-      const words = String(text || '').split(/\s+/).filter(Boolean);
-      const lines = [];
-      let line = '';
-
-      for (const word of words) {
-        const candidate = line ? `${line} ${word}` : word;
-        if (context.measureText(candidate).width > maxWidth && line) {
-          lines.push(line);
-          line = word;
-        } else {
-          line = candidate;
-        }
-      }
-
-      if (line) lines.push(line);
-      return lines.length ? lines : [''];
-    }
-
     function setError(message) {
       const el = document.getElementById('err-msg');
       el.textContent = message;
@@ -145,7 +126,7 @@
       const hour24 = safeDate.getHours();
       const hour12 = hour24 % 12 || 12;
       const meridiem = hour24 >= 12 ? 'PM' : 'AM';
-      return `GENERADO EN LAESQUINA.VISUALIZANDO.AR EL ${day}/${month}/${year} A LAS ${hour12}${meridiem}`;
+      return `GENERADO EN <strong>LAESQUINA.VISUALIZANDO.AR</strong> EL ${day}/${month}/${year} A LAS ${hour12}${meridiem}`;
     }
 
     function setHeroVisibility(show) {
@@ -165,7 +146,7 @@
       document.getElementById('result').style.display = 'none';
       document.getElementById('verdict').className = 'analysis-card';
       document.getElementById('verdict-label').textContent = '';
-      document.getElementById('verdict-generated').textContent = '';
+      document.getElementById('verdict-generated').innerHTML = '';
       document.getElementById('author-name').textContent = '';
       document.getElementById('author-handle').textContent = '';
       document.getElementById('author-badge').style.display = 'none';
@@ -267,7 +248,7 @@
 
       document.getElementById('verdict').classList.add(`is-${metrics.verdict}`);
       document.getElementById('verdict-label').textContent = metrics.verdictLabel;
-      document.getElementById('verdict-generated').textContent = formatGeneratedStamp(new Date());
+      document.getElementById('verdict-generated').innerHTML = formatGeneratedStamp(new Date());
 
       const initials = document.getElementById('avatar-initials');
       const avatarImg = document.getElementById('avatar-img');
@@ -365,163 +346,76 @@
       }
     }
 
-    async function generateImage() {
-      if (!currentData || !currentMetrics) return;
+    function buildExportCardClone(sourceNode) {
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-10000px';
+      wrapper.style.top = '0';
+      wrapper.style.padding = '24px';
+      wrapper.style.background = '#edf6fc';
+      wrapper.style.zIndex = '-1';
 
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      if (!context) return;
+      const clone = sourceNode.cloneNode(true);
+      clone.style.width = `${sourceNode.offsetWidth}px`;
+      clone.style.maxWidth = `${sourceNode.offsetWidth}px`;
+      clone.style.margin = '0';
 
-      const width = 1400;
-      const padding = 80;
-      const cardWidth = width - padding * 2;
-      const tweetText = currentData.text || '';
-      const authorName = currentData.author?.name || '';
-      const authorHandle = currentData.author?.screen_name ? `@${currentData.author.screen_name}` : '';
-      const generatedText = formatGeneratedStamp(new Date());
-
-      context.font = '400 42px "IBM Plex Sans"';
-      const tweetLines = wrapCanvasText(context, tweetText, cardWidth - 100);
-      const tweetHeight = Math.max(220, 150 + tweetLines.length * 56);
-      const height = 1180 + Math.max(0, tweetHeight - 220);
-
-      canvas.width = width;
-      canvas.height = height;
-
-      context.fillStyle = '#edf6fc';
-      context.fillRect(0, 0, width, height);
-
-      context.fillStyle = '#ffffff';
-      context.strokeStyle = 'rgba(49, 101, 140, 0.16)';
-      context.lineWidth = 2;
-      roundRect(context, padding, 60, cardWidth, height - 120, 36);
-      context.fill();
-      context.stroke();
-
-      context.fillStyle = '#6c8194';
-      context.font = '500 24px "IBM Plex Mono"';
-      context.textAlign = 'center';
-      context.fillText('TWEET ORIGINAL:', width / 2, 120);
-
-      context.fillStyle = '#ffffff';
-      context.strokeStyle = 'rgba(49, 101, 140, 0.18)';
-      roundRect(context, padding + 26, 150, cardWidth - 52, tweetHeight, 28);
-      context.fill();
-      context.stroke();
-
-      const tweetLeft = padding + 70;
-      let y = 220;
-
-      context.fillStyle = '#274c69';
-      context.font = '700 34px "IBM Plex Sans"';
-      context.textAlign = 'left';
-      context.fillText(authorName, tweetLeft, y);
-      y += 42;
-      context.fillStyle = '#6c8194';
-      context.font = '400 26px "IBM Plex Sans"';
-      context.fillText(authorHandle, tweetLeft, y);
-      y += 54;
-
-      context.fillStyle = '#274c69';
-      context.font = '400 42px "IBM Plex Sans"';
-      for (const line of tweetLines) {
-        context.fillText(line, tweetLeft, y);
-        y += 56;
-      }
-
-      const analysisTop = 150 + tweetHeight + 32;
-      context.fillStyle = '#ffffff';
-      context.strokeStyle = 'rgba(49, 101, 140, 0.18)';
-      roundRect(context, padding + 26, analysisTop, cardWidth - 52, 360, 28);
-      context.fill();
-      context.stroke();
-
-      context.fillStyle = currentMetrics.verdict === 'ratioed'
-        ? '#e34c43'
-        : currentMetrics.verdict === 'safe'
-          ? '#4c8f63'
-          : '#274c69';
-      context.font = '700 84px "IBM Plex Sans"';
-      context.textAlign = 'center';
-      context.fillText(currentMetrics.verdictLabel.toUpperCase(), width / 2, analysisTop + 120);
-
-      const trackLeft = padding + 80;
-      const trackTop = analysisTop + 176;
-      const trackWidth = cardWidth - 160;
-      const gradient = context.createLinearGradient(trackLeft, 0, trackLeft + trackWidth, 0);
-      gradient.addColorStop(0, '#e34c43');
-      gradient.addColorStop(0.5, '#b6bec6');
-      gradient.addColorStop(1, '#4c8f63');
-      context.fillStyle = gradient;
-      roundRect(context, trackLeft, trackTop, trackWidth, 12, 999);
-      context.fill();
-
-      const markerX = trackLeft + (trackWidth * currentMetrics.markerPct / 100);
-      context.fillStyle = currentMetrics.verdict === 'ratioed'
-        ? '#e34c43'
-        : currentMetrics.verdict === 'safe'
-          ? '#4c8f63'
-          : '#b69757';
-      context.beginPath();
-      context.arc(markerX, trackTop + 6, 18, 0, Math.PI * 2);
-      context.fill();
-      context.strokeStyle = '#ffffff';
-      context.lineWidth = 4;
-      context.stroke();
-
-      context.fillStyle = '#274c69';
-      context.font = '700 22px "IBM Plex Mono"';
-      context.textAlign = 'left';
-      context.fillText('LO PUTEAN', trackLeft, trackTop - 18);
-      context.textAlign = 'right';
-      context.fillText('LO BANCAN', trackLeft + trackWidth, trackTop - 18);
-
-      const metricTop = analysisTop + 230;
-      const metricWidth = (trackWidth - 36) / 4;
-      const metrics = [
-        { label: 'COMMENTS', value: fmt(currentMetrics.replies), good: false },
-        { label: 'QUOTE TWEETS', value: fmt(currentMetrics.quotes), good: false },
-        { label: 'FAVS', value: fmt(currentMetrics.likes), good: currentMetrics.verdict === 'safe' },
-        { label: 'RETUITS', value: fmt(currentMetrics.rt), good: currentMetrics.verdict === 'safe' },
-      ];
-
-      metrics.forEach((metric, index) => {
-        const metricLeft = trackLeft + index * (metricWidth + 12);
-        context.fillStyle = 'rgba(255,255,255,0.9)';
-        roundRect(context, metricLeft, metricTop, metricWidth, 84, 18);
-        context.fill();
-        context.fillStyle = '#6c8194';
-        context.font = '500 18px "IBM Plex Mono"';
-        context.textAlign = 'center';
-        context.fillText(metric.label, metricLeft + metricWidth / 2, metricTop + 28);
-        context.fillStyle = metric.good ? '#4c8f63' : '#274c69';
-        context.font = '500 34px "IBM Plex Sans"';
-        context.fillText(metric.value, metricLeft + metricWidth / 2, metricTop + 64);
+      clone.querySelectorAll('[data-export-ignore="true"]').forEach(node => {
+        node.remove();
       });
 
-      context.fillStyle = 'rgba(47, 103, 143, 0.52)';
-      context.font = '500 18px "IBM Plex Mono"';
-      context.textAlign = 'center';
-      context.fillText(generatedText, width / 2, analysisTop + 340);
+      clone.querySelectorAll('img').forEach(image => {
+        image.remove();
+      });
 
-      const link = document.createElement('a');
-      link.href = canvas.toDataURL('image/png');
-      link.download = 'la-esquina-online.png';
-      link.click();
+      clone.querySelectorAll('[id]').forEach(node => {
+        node.removeAttribute('id');
+      });
+
+      const initials = clone.querySelector('.tweet-avatar span');
+      if (initials) initials.style.display = 'inline';
+
+      wrapper.appendChild(clone);
+      return wrapper;
     }
 
-    function roundRect(context, x, y, width, height, radius) {
-      context.beginPath();
-      context.moveTo(x + radius, y);
-      context.lineTo(x + width - radius, y);
-      context.arcTo(x + width, y, x + width, y + radius, radius);
-      context.lineTo(x + width, y + height - radius);
-      context.arcTo(x + width, y + height, x + width - radius, y + height, radius);
-      context.lineTo(x + radius, y + height);
-      context.arcTo(x, y + height, x, y + height - radius, radius);
-      context.lineTo(x, y + radius);
-      context.arcTo(x, y, x + radius, y, radius);
-      context.closePath();
+    async function generateImage() {
+      if (!currentData || !currentMetrics) return;
+      const exportCard = document.getElementById('export-card');
+      if (!exportCard || !window.htmlToImage) {
+        alert('No se pudo generar la imagen.');
+        return;
+      }
+
+      const generateButton = document.getElementById('generate-image-btn');
+      const originalText = generateButton ? generateButton.textContent : '';
+      let exportWrapper = null;
+
+      try {
+        if (generateButton) generateButton.textContent = 'Generando...';
+
+        exportWrapper = buildExportCardClone(exportCard);
+        document.body.appendChild(exportWrapper);
+
+        const exportTarget = exportWrapper.firstElementChild;
+
+        const dataUrl = await window.htmlToImage.toPng(exportTarget, {
+          cacheBust: true,
+          pixelRatio: 2,
+          backgroundColor: '#edf6fc',
+        });
+
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'la-esquina-online.png';
+        link.click();
+      } catch (error) {
+        console.error(error);
+        alert('No se pudo generar la imagen.');
+      } finally {
+        if (exportWrapper) exportWrapper.remove();
+        if (generateButton) generateButton.textContent = originalText;
+      }
     }
 
     function setModalOpen(modalId, open) {

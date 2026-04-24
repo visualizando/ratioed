@@ -1,5 +1,5 @@
     :root {
-      --bg: #edf6fc;
+      --bg: #a4c6dd;
       --paper: #ffffff;
       --paper-strong: #ffffff;
       --ink: #274c69;
@@ -222,7 +222,7 @@
     }
 
     .result-frame {
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.54);
       border: 1px solid rgba(49, 101, 140, 0.12);
       border-radius: 28px;
       box-shadow: var(--shadow);
@@ -541,6 +541,11 @@
       line-height: 1.4;
       text-transform: uppercase;
       color: rgba(47, 103, 143, 0.52);
+    }
+
+    .verdict-generated strong {
+      font-weight: 700;
+      color: rgba(39, 76, 105, 0.96);
     }
 
     .share-actions {
