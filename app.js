@@ -5,6 +5,29 @@
     let currentTweetUrl = '';
     let isLoading = false;
 
+    function buildAppUrl(tweetUrl) {
+      const nextUrl = new URL(window.location.href);
+      if (tweetUrl) {
+        nextUrl.searchParams.set('url', tweetUrl);
+      } else {
+        nextUrl.searchParams.delete('url');
+      }
+      return nextUrl.toString();
+    }
+
+    function syncAppUrl(tweetUrl) {
+      window.history.replaceState({}, '', buildAppUrl(tweetUrl));
+    }
+
+    function loadTweetFromQuery() {
+      const initialUrl = new URL(window.location.href).searchParams.get('url');
+      if (!initialUrl) return;
+
+      const input = document.getElementById('tweet-url');
+      input.value = initialUrl.trim();
+      analyze();
+    }
+
     function parseTweetUrl(url) {
       try {
         const parsed = new URL(url);
@@ -228,6 +251,7 @@
         const tweet = await fetchTweet(parsed.username, parsed.id);
         currentData = tweet;
         currentTweetUrl = `https://x.com/${parsed.username}/status/${parsed.id}`;
+        syncAppUrl(currentTweetUrl);
         renderResult(tweet);
       } catch (error) {
         const message = error && error.message === 'timeout'
@@ -334,7 +358,7 @@
     async function copyLink() {
       if (!currentTweetUrl) return;
       try {
-        await navigator.clipboard.writeText(currentTweetUrl);
+        await navigator.clipboard.writeText(buildAppUrl(currentTweetUrl));
         const btn = document.getElementById('copy-link-btn');
         const original = btn.textContent;
         btn.textContent = 'Copiado';
@@ -448,3 +472,5 @@
     document.getElementById('tweet-url').addEventListener('keydown', event => {
       if (event.key === 'Enter') analyze();
     });
+
+    loadTweetFromQuery();
