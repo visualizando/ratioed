@@ -59,8 +59,8 @@
       const replies = normalizeCount(tweet?.replies);
       const quotes = normalizeCount(tweet?.quotes);
       const likes = normalizeCount(tweet?.likes);
-      const opposition = replies + (quotes * 2);
-      const support = rt + (likes * 0.5);
+      const opposition = (replies * 2) + (quotes * 3);
+      const support = rt + (likes * 0.1);
       const sample = support + opposition;
       const sentimentScore = sample > 0 ? Math.round(((support - opposition) / sample) * 100) : 0;
       const markerPct = sample > 0 ? ((sentimentScore + 100) / 2) : 50;
@@ -103,7 +103,15 @@
       let verdictLabel = 'Quedó dividido';
       let shareVerdictLabel = 'ESTA DIVIDIDA';
 
-      if (sentimentScore <= -35) {
+      if (sentimentScore <= -75) {
+        verdict = 'ratioed';
+        verdictLabel = 'Lo remil bardean';
+        shareVerdictLabel = 'REMIL BARDEA';
+      } else if (sentimentScore <= -50) {
+        verdict = 'ratioed';
+        verdictLabel = 'Lo recontra bardean';
+        shareVerdictLabel = 'RECONTRA BARDEA';
+      } else if (sentimentScore <= -25) {
         verdict = 'ratioed';
         verdictLabel = 'Lo re bardean';
         shareVerdictLabel = 'RE BARDEA';
@@ -111,13 +119,21 @@
         verdict = 'ratioed';
         verdictLabel = 'Lo bardean';
         shareVerdictLabel = 'BARDEA';
-      } else if (sentimentScore >= 35) {
+      } else if (sentimentScore >= 75) {
         verdict = 'safe';
-        verdictLabel = 'Lo re bancan';
+        verdictLabel = 'Remil banca';
+        shareVerdictLabel = 'REMIL BANCA';
+      } else if (sentimentScore >= 50) {
+        verdict = 'safe';
+        verdictLabel = 'Recontra banca';
+        shareVerdictLabel = 'RECONTRA BANCA';
+      } else if (sentimentScore >= 25) {
+        verdict = 'safe';
+        verdictLabel = 'Re banca';
         shareVerdictLabel = 'RE BANCA';
       } else if (sentimentScore > 10) {
         verdict = 'safe';
-        verdictLabel = 'La gente banca';
+        verdictLabel = 'Banca';
         shareVerdictLabel = 'BANCA';
       }
 
