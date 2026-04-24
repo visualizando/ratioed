@@ -142,24 +142,21 @@
     </main>
 
     <footer class="site-footer">
-      <div>
+      <div class="footer-copy">
         <a class="brand" href="#top" aria-label="LA ESQUINA ONLINE">
           <span>La</span><span>Esquina</span><span class="brand-dot">Online</span>
         </a>
-        <p class="footer-note">Hecho con datos públicos.</p>
+        <p class="footer-note">Lectura rápida del clima alrededor de un tuit con datos públicos vía fxtwitter.</p>
       </div>
-      <nav class="footer-nav footer-links">
-        <button class="footer-link-button" type="button" data-modal-target="modal-como-funciona">Cómo funciona</button>
-        <button class="footer-link-button" type="button" data-modal-target="modal-sobre-proyecto">Sobre el proyecto</button>
+      <nav class="footer-links" aria-label="Enlaces del footer">
+        <button class="footer-link-button" type="button" data-modal-target="modal-info">Cómo funciona</button>
+        <a class="footer-link" href="https://visualizando.ar" target="_blank" rel="noopener noreferrer">visualizando.ar</a>
+        <a class="footer-link" href="https://github.com/visualizando/ratioed" target="_blank" rel="noopener noreferrer">GitHub</a>
       </nav>
-      <div class="footer-meta">
-        <span>datos vía fxtwitter</span>
-        <span>cc 2026 visualizando.ar</span>
-      </div>
     </footer>
   </div>
 
-  <div class="modal" id="modal-como-funciona">
+  <div class="modal" id="modal-info">
     <div class="modal-background" data-close-modal></div>
     <div class="modal-card">
       <header class="modal-card-head">
@@ -167,24 +164,23 @@
         <button class="delete" aria-label="cerrar" data-close-modal></button>
       </header>
       <section class="modal-card-body">
-        <p>Armamos un índice social ponderado: cada quote tweet suma 3 puntos negativos, cada comment suma 2 puntos negativos, cada fav suma 0.1 punto positivo y cada retuit suma 1 punto positivo. Con ese balance ubicamos el tuit sobre un eje entre crítica y banca.</p>
-      </section>
-      <footer class="modal-card-foot">
-        <button class="button" data-close-modal>Cerrar</button>
-      </footer>
-    </div>
-  </div>
-
-  <div class="modal" id="modal-sobre-proyecto">
-    <div class="modal-background" data-close-modal></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Sobre el proyecto</p>
-        <button class="delete" aria-label="cerrar" data-close-modal></button>
-      </header>
-      <section class="modal-card-body">
-        <p>LA ESQUINA ONLINE usa datos de fxtwitter y muestra una lectura rápida del clima alrededor de un tuit. No interpreta ironía ni sarcasmo: ordena el balance entre respuesta y difusión.</p>
-        <p>El algoritmo hoy pondera las interacciones así: 1 quote tweet = 3 puntos negativos, 1 comment = 2 puntos negativos, 1 fav = 0.1 punto positivo y 1 rt = 1 punto positivo.</p>
+        <p>LA ESQUINA ONLINE usa métricas públicas de un tuit para estimar si el clima visible alrededor del posteo es más de crítica o más de banca. No analiza el texto ni interpreta intención: ordena señales de interacción.</p>
+        <div class="modal-info-stack">
+          <section class="modal-info-block">
+            <h3>Qué mira</h3>
+            <p>Replies y quote tweets cuentan como señales de fricción. Retweets y likes cuentan como señales de difusión y apoyo.</p>
+          </section>
+          <section class="modal-info-block">
+            <h3>Cómo calcula</h3>
+            <p>Aplicamos un índice ponderado para que no todas las interacciones pesen igual.</p>
+            <p class="modal-formula">oposición = replies × 2 + quotes × 3<br />apoyo = retweets × 1 + likes × 0.1</p>
+            <p>Con ese balance ubicamos el resultado en un eje entre “lo putean” y “lo bancan”. Si la muestra es muy chica, la app lo marca como zona gris.</p>
+          </section>
+          <section class="modal-info-block">
+            <h3>Qué no hace</h3>
+            <p>Es una heurística de interacción. Depende de que el tuit sea público y de la disponibilidad de fxtwitter, y no interpreta sarcasmo, ironía ni contexto político o cultural.</p>
+          </section>
+        </div>
       </section>
       <footer class="modal-card-foot">
         <button class="button" data-close-modal>Cerrar</button>

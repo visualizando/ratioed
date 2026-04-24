@@ -69,10 +69,15 @@
       color: var(--blue);
     }
 
-    .footer-nav,
-    .footer-meta {
+    .footer-copy {
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .footer-note,
+    .footer-links {
       display: flex;
-      gap: 1.5rem;
+      gap: 1rem;
       flex-wrap: wrap;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.72rem;
@@ -81,12 +86,21 @@
       color: var(--muted);
     }
 
-    .footer-nav a {
-      color: inherit;
-      text-decoration: none;
+    .footer-note {
+      margin: 0;
+      max-width: 42ch;
+      line-height: 1.6;
     }
 
-    .footer-nav a:hover {
+    .footer-link,
+    .footer-link-button {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.18s ease;
+    }
+
+    .footer-link:hover,
+    .footer-link-button:hover {
       color: var(--ink);
     }
 
@@ -642,25 +656,50 @@
       line-height: 1.75;
     }
 
-    .footer-links {
-      display: flex;
+    .modal-info-stack {
+      display: grid;
       gap: 1rem;
-      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .modal-info-block {
+      padding: 1rem 1.05rem;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(217, 237, 249, 0.35);
+    }
+
+    .modal-info-block h3 {
+      margin: 0 0 0.35rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .modal-info-block p {
+      margin: 0;
+    }
+
+    .modal-info-block p + p {
+      margin-top: 0.65rem;
+    }
+
+    .modal-formula {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.84rem;
+      color: var(--blue-dark);
     }
 
     .footer-link-button {
       padding: 0;
       border: none;
       background: transparent;
-      color: inherit;
       font: inherit;
       letter-spacing: inherit;
       text-transform: inherit;
       cursor: pointer;
-    }
-
-    .footer-link-button:hover {
-      color: var(--ink);
     }
 
     .spinner {
@@ -696,6 +735,12 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
+      }
+
+      .footer-copy,
+      .footer-links {
+        justify-items: center;
+        justify-content: center;
       }
 
       .metrics-grid,
