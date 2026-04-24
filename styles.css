@@ -396,6 +396,13 @@
       flex-shrink: 0;
     }
 
+    .tweet-mark svg {
+      display: block;
+      width: 1em;
+      height: 1em;
+      fill: currentColor;
+    }
+
     .tweet-text {
       font-size: clamp(1.05rem, 1.9vw, 1.28rem);
       line-height: 1.64;
